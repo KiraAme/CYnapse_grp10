@@ -69,8 +69,8 @@ public class App extends Application{
 
     public static void main(String[] args) throws Exception {
         launch(args);
-        Labyrinthe labyrinthe = new Labyrinthe("MonLabyrinthe", 10, 10, 12346L);
-            labyrinthe.genererLabyrinthe(); // Génère le labyrinthe
+        Labyrinthe labyrinthe = new Labyrinthe("MonLabyrinthe", 10, 10, 0L);
+        labyrinthe.genererLabyrinthe(); // Génère le labyrinthe
         
     }
 

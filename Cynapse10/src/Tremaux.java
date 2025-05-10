@@ -6,14 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+
 public class Tremaux extends Algorithme {
 
-    /**
-     * Exécute l'algorithme de Trémaux pas à pas.
-     *
-     * @param labyrinthe Le labyrinthe à traiter.
-     * @param gridPane   Le GridPane pour l'affichage.
-     */
     @Override
     public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane) {
         Case[][] carte = labyrinthe.getCarte();
@@ -21,8 +16,8 @@ public class Tremaux extends Algorithme {
         int longueur = labyrinthe.getLongueur();
 
         int[][] passages = new int[largeur][longueur];
+        Case[][] pred = new Case[largeur][longueur];  // Tableau des prédécesseurs
 
-        // Utilisation directe des attributs entree et sortie
         Case entree = labyrinthe.getEntree();
         Case sortie = labyrinthe.getSortie();
 
@@ -36,23 +31,17 @@ public class Tremaux extends Algorithme {
         passages[entree.getX()][entree.getY()] = 1;
         entree.setParcourue(true);
 
-        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, stack, largeur, longueur, sortie);
+        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie);
     }
-    /**
-     * Exécute l'algorithme de Trémaux de manière directe.
-     *
-     * @param labyrinthe Le labyrinthe à traiter.
-     * @param gridPane   Le GridPane pour l'affichage.
-     */
+
     @Override
     public void algoDirect(Labyrinthe labyrinthe, GridPane gridPane) {
         Case[][] carte = labyrinthe.getCarte();
         int largeur = labyrinthe.getLargeur();
         int longueur = labyrinthe.getLongueur();
-
         int[][] passages = new int[largeur][longueur];
+        Case[][] pred = new Case[largeur][longueur];
 
-        // Utilisation directe des attributs entree et sortie
         Case entree = labyrinthe.getEntree();
         Case sortie = labyrinthe.getSortie();
 
@@ -72,73 +61,129 @@ public class Tremaux extends Algorithme {
             int y = current.getY();
 
             current.setParcourue(true);
-
-            
+            current.setCouleur(Color.YELLOW);
 
             if (current == sortie) {
                 System.out.println("Sortie trouvée !");
-                break;
+                afficherChemin(labyrinthe, pred, sortie, gridPane);
+                return;
             }
 
-            List<Case> voisinsDisponibles = getVoisinsDisponibles(current, carte, passages, largeur, longueur);
+            // Obtenir les voisins disponibles
+            List<Case> voisinsDisponibles = new ArrayList<>();
+
+            // D'abord essayer les cases non visitées
+            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
+                voisinsDisponibles.add(carte[x - 1][y]);
+            }
+            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 0) {
+                voisinsDisponibles.add(carte[x + 1][y]);
+            }
+            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 0) {
+                voisinsDisponibles.add(carte[x][y - 1]);
+            }
+            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 0) {
+                voisinsDisponibles.add(carte[x][y + 1]);
+            }
+
+            // Si pas de cases non visitées et moins de 2 passages, essayer les cases visitées une fois
+            if (voisinsDisponibles.isEmpty() && passages[x][y] < 2) {
+                if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 1) {
+                    voisinsDisponibles.add(carte[x - 1][y]);
+                }
+                if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 1) {
+                    voisinsDisponibles.add(carte[x + 1][y]);
+                }
+                if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 1) {
+                    voisinsDisponibles.add(carte[x][y - 1]);
+                }
+                if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 1) {
+                    voisinsDisponibles.add(carte[x][y + 1]);
+                }
+            }
 
             if (!voisinsDisponibles.isEmpty()) {
-                Case next = choisirVoisin(voisinsDisponibles, passages);
+                Case next = voisinsDisponibles.get(0);
                 stack.push(next);
-                passages[next.getX()][next.getY()] += 1;
+                passages[next.getX()][next.getY()]++;
+                passages[x][y]++;
+                pred[next.getX()][next.getY()] = current;
             } else {
                 stack.pop();
             }
         }
-
-        // Affiche le labyrinthe à la fin
-        AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
     }
-    /**
-     * Exécute une étape de l'algorithme de Trémaux pas à pas.
-     *
-     * @param labyrinthe Le labyrinthe à traiter.
-     * @param gridPane   Le GridPane pour l'affichage.
-     * @param carte      La carte du labyrinthe.
-     * @param passages   Le tableau des passages.
-     * @param stack      La pile pour le parcours.
-     * @param largeur    La largeur du labyrinthe.
-     * @param longueur   La longueur du labyrinthe.
-     * @param sortie     La case de sortie.
-     */
-    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Stack<Case> stack, int largeur, int longueur, Case sortie) {
+
+    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie) {
         if (stack.isEmpty()) {
             System.out.println("Exploration terminée (pile vide).");
             return;
         }
 
         Case current = stack.peek();
-        int x = current.getX();
-        int y = current.getY();
 
-        current.setParcourue(true);
-        // Met à jour la couleur de la case actuelle pour la différencier
-        current.setCouleur(Color.RED);  // Changez cette couleur à votre goût
-
-        AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
-        current.setCouleur(Color.YELLOW);
+        // Si on a trouvé la sortie
         if (current == sortie) {
             System.out.println("Sortie trouvée !");
+            afficherChemin(labyrinthe, pred, sortie, gridPane);
             return;
         }
 
-        List<Case> voisinsDisponibles = getVoisinsDisponibles(current, carte, passages, largeur, longueur);
+        // Marquer et colorer la case courante
+        current.setParcourue(true);
+        current.setCouleur(Color.RED);
+        AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+        current.setCouleur(Color.YELLOW);
+
+        // Obtenir les voisins disponibles
+        List<Case> voisinsDisponibles = new ArrayList<>();
+        int x = current.getX();
+        int y = current.getY();
+
+        // Vérifier chaque direction et ajouter uniquement les voisins accessibles
+        // D'abord essayer les cases non visitées
+        if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
+            voisinsDisponibles.add(carte[x - 1][y]);
+        }
+        if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 0) {
+            voisinsDisponibles.add(carte[x + 1][y]);
+        }
+        if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 0) {
+            voisinsDisponibles.add(carte[x][y - 1]);
+        }
+        if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 0) {
+            voisinsDisponibles.add(carte[x][y + 1]);
+        }
+
+        // Si pas de cases non visitées, essayer les cases visitées une fois
+        if (voisinsDisponibles.isEmpty() && passages[x][y] < 2) {
+            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 1) {
+                voisinsDisponibles.add(carte[x - 1][y]);
+            }
+            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 1) {
+                voisinsDisponibles.add(carte[x + 1][y]);
+            }
+            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 1) {
+                voisinsDisponibles.add(carte[x][y - 1]);
+            }
+            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 1) {
+                voisinsDisponibles.add(carte[x][y + 1]);
+            }
+        }
 
         if (!voisinsDisponibles.isEmpty()) {
-            Case next = choisirVoisin(voisinsDisponibles, passages);
+            Case next = voisinsDisponibles.get(0);
             stack.push(next);
-            passages[next.getX()][next.getY()] += 1;
+            passages[next.getX()][next.getY()]++;
+            passages[x][y]++;
+            pred[next.getX()][next.getY()] = current;
         } else {
             stack.pop();
         }
 
+        // Pause avant de continuer
         PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
-        pause.setOnFinished(e -> executerEtapePasAPas(labyrinthe, gridPane, carte, passages, stack, largeur, longueur, sortie));
+        pause.setOnFinished(e -> executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie));
         pause.play();
     }
 
@@ -146,33 +191,102 @@ public class Tremaux extends Algorithme {
         List<Case> voisins = new ArrayList<>();
         int x = current.getX();
         int y = current.getY();
+        int currentPassages = passages[x][y];
 
-        if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] < 2) {
-            voisins.add(carte[x - 1][y]);
-        }
-        if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] < 2) {
-            voisins.add(carte[x + 1][y]);
-        }
-        if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] < 2) {
-            voisins.add(carte[x][y - 1]);
-        }
-        if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] < 2) {
-            voisins.add(carte[x][y + 1]);
+        // En retour en arrière, on ne peut aller que vers des cases visitées une fois
+        if (currentPassages == 2) {
+            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 1) {
+                voisins.add(carte[x - 1][y]);
+            }
+            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 1) {
+                voisins.add(carte[x + 1][y]);
+            }
+            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 1) {
+                voisins.add(carte[x][y - 1]);
+            }
+            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 1) {
+                voisins.add(carte[x][y + 1]);
+            }
+        } 
+        // En exploration normale, on préfère les cases non visitées
+        else {
+            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
+                voisins.add(carte[x - 1][y]);
+            }
+            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 0) {
+                voisins.add(carte[x + 1][y]);
+            }
+            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 0) {
+                voisins.add(carte[x][y - 1]);
+            }
+            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 0) {
+                voisins.add(carte[x][y + 1]);
+            }
+            
+            // S'il n'y a pas de cases non visitées, on prend les cases visitées une fois
+            if (voisins.isEmpty()) {
+                if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 1) {
+                    voisins.add(carte[x - 1][y]);
+                }
+                if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 1) {
+                    voisins.add(carte[x + 1][y]);
+                }
+                if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 1) {
+                    voisins.add(carte[x][y - 1]);
+                }
+                if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 1) {
+                    voisins.add(carte[x][y + 1]);
+                }
+            }
         }
 
         return voisins;
     }
 
-    private Case choisirVoisin(List<Case> voisins, int[][] passages) {
-        for (Case v : voisins) {
-            if (passages[v.getX()][v.getY()] == 0) {
-                return v;
-            }
-        }
-        return voisins.get(0);
-    }
+
 
     private boolean isInBounds(int x, int y, int largeur, int longueur) {
         return x >= 0 && y >= 0 && x < largeur && y < longueur;
     }
+
+    /**
+     * Affiche le chemin le plus court de la sortie à l'entrée en inversant le tableau des prédécesseurs.
+     *
+     * @param labyrinthe Le labyrinthe à traiter.
+     * @param pred       Le tableau des prédécesseurs.
+     * @param sortie     La case de sortie.
+     */
+    private void afficherChemin(Labyrinthe labyrinthe, Case[][] pred, Case sortie, GridPane gridPane) {
+        Case entree = labyrinthe.getEntree();
+        Case current = sortie;
+        List<Case> chemin = new ArrayList<>();
+        
+    
+        // Reconstruire le chemin de la sortie vers l'entrée
+        while (current != null && current != entree) {
+            chemin.add(current);
+            System.out.println("Case: (" + current.getX() + ", " + current.getY() + ")");
+            current = pred[current.getX()][current.getY()];
+        }
+    
+        // Ajouter l'entrée au chemin si elle a été trouvée
+        if (current == entree) {
+            chemin.add(entree);
+        }
+    
+        // Colorer uniquement le chemin trouvé
+        for (Case c : chemin) {
+            if (c == entree) {
+                c.setCouleur(Color.BLUE);      // Entrée en bleu
+            } else if (c == sortie) {
+                c.setCouleur(Color.GREEN);     // Sortie en vert
+            } else {
+                c.setCouleur(Color.PINK);      // Chemin en rose
+            }
+        }
+    
+        // Rafraîchir l'affichage
+        AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+    }
+    
 }

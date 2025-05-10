@@ -29,6 +29,8 @@ public class AfficheurLabyrinthe {
                     rectangle.setFill(Color.GREEN);
                 } else if (currentCase.getCouleur()==Color.RED) {
                     rectangle.setFill(Color.RED);
+                } else if (currentCase.getCouleur()==Color.PINK) {
+                    rectangle.setFill(Color.PINK);
                 }else if (currentCase.estParcourue()) {
                     rectangle.setFill(Color.YELLOW);
                 } else {
