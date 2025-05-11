@@ -4,6 +4,10 @@ import java.util.Random;
 import java.util.Stack;
 
 import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.util.Duration;
 
 public class Labyrinthe {
     private String nom;
@@ -104,61 +108,118 @@ public class Labyrinthe {
 
         this.carte[this.largeur - 1][this.longueur - 1].estSortie = true;
     }
+    
+    public void genererLabyrinthePasAPas(GridPane gridPane, Label infoLabel) {
+        this.carte = new Case[this.largeur][this.longueur];
+
+        // Initialisation des cases avec tous les murs
+        for (int x = 0; x < this.largeur; x++) {
+            for (int y = 0; y < this.longueur; y++) {
+                this.carte[x][y] = new Case(x, y, true, true, true, true, false, false);
+            }
+        }
+
+        boolean[][] visitees = new boolean[this.largeur][this.longueur];
+        Stack<Case> stack = new Stack<>();
+        this.entree = this.carte[0][0];
+        this.sortie = this.carte[this.largeur - 1][this.longueur - 1];
+        this.entree.estEntree = true;
+        visitees[0][0] = true;
+        stack.push(this.entree);
+
+        long startTime = System.nanoTime();
+        genererEtapePasAPas(gridPane, infoLabel, visitees, stack, startTime, new int[]{0});
+    }
+
+    private void genererEtapePasAPas(GridPane gridPane, Label infoLabel, boolean[][] visitees, Stack<Case> stack, long startTime, int[] casesCreees) {
+        if (stack.isEmpty()) {
+            this.carte[this.largeur - 1][this.longueur - 1].estSortie = true;
+            long endTime = System.nanoTime();
+            Platform.runLater(() -> {
+                AfficheurLabyrinthe.afficherLabyrinthe(gridPane, this);
+                infoLabel.setText("Génération terminée !\nTemps : " + String.format("%.3f", (endTime - startTime) / 1_000_000_000.0) + " s\nCases créées : " + casesCreees[0]);
+            });
+            return;
+        }
+
+        Case current = stack.peek();
+        List<Case> voisinsNonVisites = getVoisinsNonVisites(current, visitees);
+
+        if (!voisinsNonVisites.isEmpty()) {
+            Case voisin = voisinsNonVisites.get(random.nextInt(voisinsNonVisites.size()));
+            supprimerMurEntre(current, voisin);
+            visitees[voisin.getX()][voisin.getY()] = true;
+            stack.push(voisin);
+            casesCreees[0]++;
+        } else {
+            stack.pop();
+        }
+
+        Platform.runLater(() -> {
+            AfficheurLabyrinthe.afficherLabyrinthe(gridPane, this);
+            long now = System.nanoTime();
+            infoLabel.setText("Génération en cours...\nTemps : " + String.format("%.3f", (now - startTime) / 1_000_000_000.0) + " s\nCases créées : " + casesCreees[0]);
+        });
+
+        PauseTransition pause = new PauseTransition(Duration.millis(20)); // Vitesse d'animation
+        pause.setOnFinished(e -> genererEtapePasAPas(gridPane, infoLabel, visitees, stack, startTime, casesCreees));
+        pause.play();
+    }
+    
     /**
      * Résout le labyrinthe en utilisant l'algorithme spécifié.
      *
      * @param algo      L'algorithme à utiliser pour résoudre le labyrinthe.
      * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
+     * @param infoLabel Le Label pour afficher les statistiques.
      */
-    public void résoudredirect(Algo algo,GridPane gridPane) {
+    public void résoudredirect(Algo algo, GridPane gridPane, Label infoLabel) {
         Algorithme algorithme = null;
-    
+
         switch (algo) {
             case Trémaux:
                 algorithme = new Tremaux();
                 break;
             case Deadend:
-                // algorithme = new Deadend(); // à créer plus tard
                 System.out.println("Algorithme Deadend pas encore implémenté.");
                 return;
             case ShortestPath:
-                // algorithme = new ShortestPath(); // à créer plus tard
                 System.out.println("Algorithme ShortestPath pas encore implémenté.");
                 return;
             default:
                 System.out.println("Algorithme non reconnu.");
                 return;
         }
-    
-        algorithme.algoDirect(this, gridPane); // Passer le GridPane si nécessaire
+
+        algorithme.algoDirect(this, gridPane, infoLabel);
     }
+
     /**
      * Résout le labyrinthe pas à pas en utilisant l'algorithme spécifié.
      *
      * @param algo      L'algorithme à utiliser pour résoudre le labyrinthe.
      * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
+     * @param infoLabel Le Label pour afficher les statistiques.
      */
-    public void résoudrePasAPas(Algo algo,GridPane gridPane) {
+    public void résoudrePasAPas(Algo algo, GridPane gridPane, Label infoLabel) {
         Algorithme algorithme = null;
-    
+
         switch (algo) {
             case Trémaux:
                 algorithme = new Tremaux();
                 break;
             case Deadend:
-                // algorithme = new Deadend(); // à créer plus tard
                 System.out.println("Algorithme Deadend pas encore implémenté.");
                 return;
             case ShortestPath:
-                // algorithme = new ShortestPath(); // à créer plus tard
                 System.out.println("Algorithme ShortestPath pas encore implémenté.");
                 return;
             default:
                 System.out.println("Algorithme non reconnu.");
                 return;
         }
-    
-        algorithme.algoPasAPas(this, gridPane); // Passer le GridPane si nécessaire
+
+        algorithme.algoPasAPas(this, gridPane, infoLabel);
     }
 
     /**

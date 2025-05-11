@@ -2,6 +2,7 @@ import javafx.animation.PauseTransition;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -10,7 +11,7 @@ import java.util.Stack;
 public class Tremaux extends Algorithme {
 
     @Override
-    public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane) {
+    public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel) {
         Case[][] carte = labyrinthe.getCarte();
         int largeur = labyrinthe.getLargeur();
         int longueur = labyrinthe.getLongueur();
@@ -31,11 +32,15 @@ public class Tremaux extends Algorithme {
         passages[entree.getX()][entree.getY()] = 1;
         entree.setParcourue(true);
 
-        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie);
+        // Mesure du temps et compteur de cases parcourues
+        long startTime = System.nanoTime();
+        int[] casesParcourues = new int[] {0}; // Utilisation d'un tableau pour modification dans la méthode récursive
+
+        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel);
     }
 
     @Override
-    public void algoDirect(Labyrinthe labyrinthe, GridPane gridPane) {
+    public void algoDirect(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel) {
         Case[][] carte = labyrinthe.getCarte();
         int largeur = labyrinthe.getLargeur();
         int longueur = labyrinthe.getLongueur();
@@ -55,6 +60,9 @@ public class Tremaux extends Algorithme {
         passages[entree.getX()][entree.getY()] = 1;
         entree.setParcourue(true);
 
+        long startTime = System.nanoTime();
+        int casesParcourues = 0;
+
         while (!stack.isEmpty()) {
             Case current = stack.peek();
             int x = current.getX();
@@ -64,10 +72,13 @@ public class Tremaux extends Algorithme {
             current.setCouleur(Color.YELLOW);
 
             if (current == sortie) {
-                System.out.println("Sortie trouvée !");
-                afficherChemin(labyrinthe, pred, sortie, gridPane);
+                long endTime = System.nanoTime();
+                int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
+                infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues + "\nNombre de cases du chemin final : " + cheminFinal);
                 return;
             }
+
+            casesParcourues++;
 
             // Obtenir les voisins disponibles
             List<Case> voisinsDisponibles = new ArrayList<>();
@@ -112,11 +123,15 @@ public class Tremaux extends Algorithme {
                 stack.pop();
             }
         }
+        // Si la pile est vide sans trouver la sortie
+        long endTime = System.nanoTime();
+        infoLabel.setText("Exploration terminée (pile vide).\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues);
     }
 
-    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie) {
+    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel) {
         if (stack.isEmpty()) {
-            System.out.println("Exploration terminée (pile vide).");
+            long endTime = System.nanoTime();
+            infoLabel.setText("Exploration terminée (pile vide).\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
             return;
         }
 
@@ -124,8 +139,9 @@ public class Tremaux extends Algorithme {
 
         // Si on a trouvé la sortie
         if (current == sortie) {
-            System.out.println("Sortie trouvée !");
-            afficherChemin(labyrinthe, pred, sortie, gridPane);
+            long endTime = System.nanoTime();
+            int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
+            infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
             return;
         }
 
@@ -134,6 +150,13 @@ public class Tremaux extends Algorithme {
         current.setCouleur(Color.RED);
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
         current.setCouleur(Color.YELLOW);
+
+        // Incrémentation APRÈS le test de la sortie
+        casesParcourues[0]++;
+
+        // Affichage en direct
+        long now = System.nanoTime();
+        infoLabel.setText("En cours...\nTemps d'exécution : " + ((now - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
 
         // Obtenir les voisins disponibles
         List<Case> voisinsDisponibles = new ArrayList<>();
@@ -183,7 +206,7 @@ public class Tremaux extends Algorithme {
 
         // Pause avant de continuer
         PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
-        pause.setOnFinished(e -> executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie));
+        pause.setOnFinished(e -> executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel));
         pause.play();
     }
 
@@ -255,13 +278,13 @@ public class Tremaux extends Algorithme {
      * @param labyrinthe Le labyrinthe à traiter.
      * @param pred       Le tableau des prédécesseurs.
      * @param sortie     La case de sortie.
+     * @return           Le nombre de cases du chemin final.
      */
-    private void afficherChemin(Labyrinthe labyrinthe, Case[][] pred, Case sortie, GridPane gridPane) {
+    private int afficherChemin(Labyrinthe labyrinthe, Case[][] pred, Case sortie, GridPane gridPane) {
         Case entree = labyrinthe.getEntree();
         Case current = sortie;
         List<Case> chemin = new ArrayList<>();
         
-    
         // Reconstruire le chemin de la sortie vers l'entrée
         while (current != null && current != entree) {
             chemin.add(current);
@@ -287,6 +310,8 @@ public class Tremaux extends Algorithme {
     
         // Rafraîchir l'affichage
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+
+        return chemin.size();
     }
     
 }
