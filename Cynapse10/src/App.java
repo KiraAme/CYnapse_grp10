@@ -73,6 +73,7 @@ public class App extends Application{
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
                 labyrintheHolder[0].genererLabyrinthe();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
+                // Afficher les boutons d'algo seulement après la génération
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
                 buttonGenerer.setVisible(false);
@@ -89,9 +90,11 @@ public class App extends Application{
                 int largeur = Integer.parseInt(largeurField.getText());
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
-                labyrintheHolder[0].genererLabyrinthePasAPas(gridPane, infoLabel);
-                buttonTremauxdirect.setVisible(true);
-                buttonTremauxPasAPas.setVisible(true);
+                // Passe un Runnable qui affiche les boutons à la fin
+                labyrintheHolder[0].genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
+                    buttonTremauxdirect.setVisible(true);
+                    buttonTremauxPasAPas.setVisible(true);
+                });
                 buttonGenerer.setVisible(false);
                 buttonGenererPasAPas.setVisible(false);
                 saisieFieldsBox.setVisible(false);
