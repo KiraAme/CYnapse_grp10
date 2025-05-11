@@ -16,15 +16,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ScrollPane;
 
 public class App extends Application{
-    private static final int TILE_SIZE = 20; // Taille d'une case (en pixels)
+    
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         VBox root = new VBox();
         primaryStage.setTitle("Générateur de Labyrinthe");
-        Scene scene = new Scene(root, 800, 800); // Agrandis la fenêtre pour le zoom
+        Scene scene = new Scene(root,1000, 1000); // Agrandis la fenêtre pour le zoom
 
         Labyrinthe[] labyrintheHolder = new Labyrinthe[1];
+        final boolean[] modificationAutorisee = {true};
 
         // Champs de saisie utilisateur
         TextField longueurField = new TextField("20");
@@ -46,7 +47,14 @@ public class App extends Application{
         buttonTremauxPasAPas.setVisible(false);
 
         GridPane gridPane = new GridPane();
+        gridPane.setHgap(0);
+        gridPane.setVgap(0);
+        gridPane.setPadding(javafx.geometry.Insets.EMPTY);
         Label infoLabel = new Label("Statistiques :");
+        infoLabel.setWrapText(true); 
+        infoLabel.setMaxWidth(Double.MAX_VALUE); // <-- Ajoute cette ligne
+        infoLabel.setMinHeight(100); // <-- Ajoute cette ligne pour forcer une hauteur minimale
+        VBox.setVgrow(infoLabel, javafx.scene.layout.Priority.ALWAYS); // <-- Ajoute cette ligne
 
         // Ajoute le GridPane dans un ScrollPane pour pouvoir dézoomer/déplacer
         ScrollPane scrollPane = new ScrollPane(gridPane);
@@ -113,57 +121,94 @@ public class App extends Application{
 
         // Action du bouton "Trémaux"
         buttonTremauxdirect.setOnMouseClicked(event -> {
+            modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.Trémaux, gridPane, infoLabel);
             }
-            buttonTremauxdirect.setVisible(false);
-            buttonTremauxPasAPas.setVisible(false);
+            
+            algoButtonsBox.setVisible(false);
         });
 
         // Action du bouton "Trémaux pas à pas"
         buttonTremauxPasAPas.setOnMouseClicked(event -> {
+            modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel);
             }
-            buttonTremauxdirect.setVisible(false);
-            buttonTremauxPasAPas.setVisible(false);
+            algoButtonsBox.setVisible(false);
         });
         buttonDeadEndPasaPas.setOnMouseClicked(event -> {
+            modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel);
             }
-            buttonDeadEndPasaPas.setVisible(false);
-            buttonTremauxdirect.setVisible(false);
-            buttonTremauxPasAPas.setVisible(false);
+            algoButtonsBox.setVisible(false);
         });
         buttonDeadEnddirect.setOnMouseClicked(event -> {
+            modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.Deadend, gridPane, infoLabel);
             }
-            buttonDeadEnddirect.setVisible(false);
-            buttonTremauxdirect.setVisible(false);
-            buttonTremauxPasAPas.setVisible(false);
-        });
-
-        // Ajoute un slider pour le zoom
-        javafx.scene.control.Slider zoomSlider = new javafx.scene.control.Slider(0.1, 2.0, 1.0);
-        zoomSlider.setShowTickLabels(true);
-        zoomSlider.setShowTickMarks(true);
-        zoomSlider.setMajorTickUnit(0.5);
-        zoomSlider.setMinorTickCount(4);
-        zoomSlider.setBlockIncrement(0.1);
-        Label zoomLabel = new Label("Zoom : 1.0x");
-
-        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            double scale = newVal.doubleValue();
-            gridPane.setScaleX(scale);
-            gridPane.setScaleY(scale);
-            zoomLabel.setText(String.format("Zoom : %.2fx", scale));
+            algoButtonsBox.setVisible(false);
         });
 
         
 
-        root.getChildren().addAll(saisieBox, scrollPane, infoLabel);
+       
+
+        // Champ pour la direction à modifier
+        TextField directionField = new TextField();
+        directionField.setPromptText("Nord, Sud, Est ou Ouest");
+        directionField.setVisible(false);
+        Label directionLabel = new Label("Entrez la direction à modifier :");
+        directionLabel.setVisible(false);
+
+        root.getChildren().add(directionLabel);
+        root.getChildren().add(directionField);
+
+        final Case[] selectedCase = new Case[1];
+
+        // Gestion du clic sur une case du GridPane
+        gridPane.setOnMouseClicked(event -> {
+            if (!modificationAutorisee[0]) return; // Bloque la modification si un algo a été lancé
+
+            double scale = gridPane.getScaleX();
+            double mouseX = event.getX() / scale;
+            double mouseY = event.getY() / scale;
+
+            double cellWidth = gridPane.getWidth() / labyrintheHolder[0].getLongueur();
+            double cellHeight = gridPane.getHeight() / labyrintheHolder[0].getLargeur();
+
+            int col = (int) Math.floor(mouseX / cellWidth);
+            int row = (int) Math.floor(mouseY / cellHeight);
+
+            Labyrinthe lab = labyrintheHolder[0];
+            if (lab != null && lab.getCarte() != null && lab.isInBounds(row, col)) {
+                selectedCase[0] = lab.getCarte()[row][col];
+                directionField.setVisible(true);
+                directionLabel.setVisible(true);
+                directionField.clear();
+                directionField.requestFocus();
+            }
+        });
+
+        // Quand l'utilisateur entre une direction et appuie sur Entrée
+        directionField.setOnAction(e -> {
+            String dir = directionField.getText().trim().toLowerCase();
+            if (selectedCase[0] != null && (dir.equals("nord") || dir.equals("sud") || dir.equals("est") || dir.equals("ouest"))) {
+                labyrintheHolder[0].modifierLabyrinthe(selectedCase[0], dir);
+                AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
+                directionField.setVisible(false);
+                directionLabel.setVisible(false);
+            } else {
+                directionField.setText("");
+                directionField.setPromptText("Nord, Sud, Est ou Ouest");
+            }
+        });
+        
+        root.getChildren().addAll(  saisieBox,scrollPane,infoLabel);
+        
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }

@@ -1,4 +1,4 @@
-import java.awt.image.MultiResolutionImage;
+//import java.awt.image.MultiResolutionImage;
 import javafx.animation.PauseTransition;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;

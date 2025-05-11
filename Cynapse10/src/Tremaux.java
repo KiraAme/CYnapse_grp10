@@ -71,14 +71,21 @@ public class Tremaux extends Algorithme {
             current.setParcourue(true);
             current.setCouleur(Color.YELLOW);
 
+            casesParcourues++;
+
             if (current == sortie) {
                 long endTime = System.nanoTime();
                 int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
-                infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues + "\nNombre de cases du chemin final : " + cheminFinal);
+                infoLabel.setText(
+                    "Sortie trouvée !\n" +
+                    "Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\n" +
+                    "Nombre de cases parcourues : " + casesParcourues + "\n" +
+                    "Nombre de cases du chemin final : " + cheminFinal
+                );
                 return;
             }
 
-            casesParcourues++;
+            
 
             // Obtenir les voisins disponibles
             List<Case> voisinsDisponibles = new ArrayList<>();
@@ -136,12 +143,14 @@ public class Tremaux extends Algorithme {
         }
 
         Case current = stack.peek();
-
+        casesParcourues[0]++;
         // Si on a trouvé la sortie
         if (current == sortie) {
             long endTime = System.nanoTime();
             int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
-            infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
+            infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) +
+                              " s\nNombre de cases parcourues : " + casesParcourues[0] +
+                              "\nNombre de cases du chemin final : " + cheminFinal);
             return;
         }
 
@@ -151,8 +160,8 @@ public class Tremaux extends Algorithme {
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
         current.setCouleur(Color.YELLOW);
 
-        // Incrémentation APRÈS le test de la sortie
-        casesParcourues[0]++;
+        
+       
 
         // Affichage en direct
         long now = System.nanoTime();

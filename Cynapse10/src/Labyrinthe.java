@@ -33,7 +33,7 @@ public class Labyrinthe {
      * @param y La coordonnée y.
      * @return true si les coordonnées sont dans les limites, false sinon.
      */
-    private boolean isInBounds(int x, int y) {
+    public boolean isInBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < this.largeur && y < this.longueur;
     }
     /**
@@ -344,6 +344,37 @@ public class Labyrinthe {
      */
     public Case getSortie() { return sortie; }
 
-    
+    public void modifierLabyrinthe(Case c, String direction) {
+        direction = direction.trim().toLowerCase();
+        switch (direction) {
+            case "nord":
+                c.murNord = !c.murNord;
+                if (isInBounds(c.getX() - 1, c.getY())) {
+                    carte[c.getX() - 1][c.getY()].murSud = c.murNord;
+                }
+                break;
+            case "sud":
+                c.murSud = !c.murSud;
+                if (isInBounds(c.getX() + 1, c.getY())) {
+                    carte[c.getX() + 1][c.getY()].murNord = c.murSud;
+                }
+                break;
+            case "est":
+                c.murEst = !c.murEst;
+                if (isInBounds(c.getX(), c.getY() + 1)) {
+                    carte[c.getX()][c.getY() + 1].murOuest = c.murEst;
+                }
+                break;
+            case "ouest":
+                c.murOuest = !c.murOuest;
+                if (isInBounds(c.getX(), c.getY() - 1)) {
+                    carte[c.getX()][c.getY() - 1].murEst = c.murOuest;
+                }
+                break;
+            default:
+                // Ne rien faire si la direction n'est pas reconnue
+                break;
+        }
+    }
     
 }
