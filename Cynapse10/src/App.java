@@ -38,6 +38,10 @@ public class App extends Application{
         Button buttonGenererPasAPas = new Button("Générer Labyrinthe pas à pas");
         Button buttonTremauxdirect = new Button("Trémaux version directe");
         Button buttonTremauxPasAPas = new Button("Trémaux version pas a pas");
+        Button buttonDeadEndPasaPas = new Button("DeadEnd version Pas a Pas");
+        Button buttonDeadEnddirect = new Button("DeadEnd version directe");
+        buttonDeadEndPasaPas.setVisible(false);
+        buttonDeadEnddirect.setVisible(false);
         buttonTremauxdirect.setVisible(false);
         buttonTremauxPasAPas.setVisible(false);
 
@@ -57,7 +61,7 @@ public class App extends Application{
         );
         saisieFieldsBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox algoButtonsBox = new VBox(5, buttonTremauxdirect, buttonTremauxPasAPas);
+        VBox algoButtonsBox = new VBox(5, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect,buttonDeadEndPasaPas);
         algoButtonsBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox saisieBox = new VBox(5, 
@@ -76,6 +80,8 @@ public class App extends Application{
                 // Afficher les boutons d'algo seulement après la génération
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
+                buttonDeadEndPasaPas.setVisible(true);
+                buttonDeadEnddirect.setVisible(true);
                 buttonGenerer.setVisible(false);
                 saisieFieldsBox.setVisible(false);
             } catch (NumberFormatException e) {
@@ -94,6 +100,8 @@ public class App extends Application{
                 labyrintheHolder[0].genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
                     buttonTremauxdirect.setVisible(true);
                     buttonTremauxPasAPas.setVisible(true);
+                    buttonDeadEndPasaPas.setVisible(true);
+                    buttonDeadEnddirect.setVisible(true);
                 });
                 buttonGenerer.setVisible(false);
                 buttonGenererPasAPas.setVisible(false);
@@ -117,6 +125,22 @@ public class App extends Application{
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel);
             }
+            buttonTremauxdirect.setVisible(false);
+            buttonTremauxPasAPas.setVisible(false);
+        });
+        buttonDeadEndPasaPas.setOnMouseClicked(event -> {
+            if (labyrintheHolder[0] != null) {
+                labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel);
+            }
+            buttonDeadEndPasaPas.setVisible(false);
+            buttonTremauxdirect.setVisible(false);
+            buttonTremauxPasAPas.setVisible(false);
+        });
+        buttonDeadEnddirect.setOnMouseClicked(event -> {
+            if (labyrintheHolder[0] != null) {
+                labyrintheHolder[0].résoudredirect(Algo.Deadend, gridPane, infoLabel);
+            }
+            buttonDeadEnddirect.setVisible(false);
             buttonTremauxdirect.setVisible(false);
             buttonTremauxPasAPas.setVisible(false);
         });

@@ -239,8 +239,8 @@ public class Labyrinthe {
                 algorithme = new Tremaux();
                 break;
             case Deadend:
-                System.out.println("Algorithme Deadend pas encore implémenté.");
-                return;
+                algorithme = new DeadEnd();
+                break;
             case ShortestPath:
                 System.out.println("Algorithme ShortestPath pas encore implémenté.");
                 return;
@@ -267,8 +267,8 @@ public class Labyrinthe {
                 algorithme = new Tremaux();
                 break;
             case Deadend:
-                System.out.println("Algorithme Deadend pas encore implémenté.");
-                return;
+                algorithme = new DeadEnd();
+                break;
             case ShortestPath:
                 System.out.println("Algorithme ShortestPath pas encore implémenté.");
                 return;
