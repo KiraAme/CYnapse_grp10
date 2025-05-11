@@ -34,6 +34,8 @@ public class App extends Application{
         largeurField.setPromptText("Largeur");
         TextField seedField = new TextField("0");
         seedField.setPromptText("Seed");
+        TextField vitesse = new TextField("100");
+        vitesse.setPromptText("Vitesse (ms)");
 
         Button buttonGenerer = new Button("Générer Labyrinthe");
         Button buttonGenererPasAPas = new Button("Générer Labyrinthe pas à pas");
@@ -55,8 +57,7 @@ public class App extends Application{
         infoLabel.setMaxWidth(Double.MAX_VALUE); // <-- Ajoute cette ligne
         infoLabel.setMinHeight(100); // <-- Ajoute cette ligne pour forcer une hauteur minimale
         VBox.setVgrow(infoLabel, javafx.scene.layout.Priority.ALWAYS); // <-- Ajoute cette ligne
-
-        // Ajoute le GridPane dans un ScrollPane pour pouvoir dézoomer/déplacer
+        
         ScrollPane scrollPane = new ScrollPane(gridPane);
         scrollPane.setPannable(true);
         // Organisation de l'UI
@@ -64,12 +65,13 @@ public class App extends Application{
             new Label("Longueur :"), longueurField,
             new Label("Largeur :"), largeurField,
             new Label("Seed :"), seedField,
+            new Label("Vitesse :"), vitesse,
             buttonGenerer,
             buttonGenererPasAPas
         );
         saisieFieldsBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox algoButtonsBox = new VBox(5, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect,buttonDeadEndPasaPas);
+        VBox algoButtonsBox = new VBox(5, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect, buttonDeadEndPasaPas);
         algoButtonsBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox saisieBox = new VBox(5, 
@@ -83,13 +85,15 @@ public class App extends Application{
                 int largeur = Integer.parseInt(largeurField.getText());
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
+
+                // Génération directe (bloquante, sans animation d'attente)
                 labyrintheHolder[0].genererLabyrinthe();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
-                // Afficher les boutons d'algo seulement après la génération
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
                 buttonDeadEndPasaPas.setVisible(true);
                 buttonDeadEnddirect.setVisible(true);
+
                 buttonGenerer.setVisible(false);
                 saisieFieldsBox.setVisible(false);
             } catch (NumberFormatException e) {
@@ -110,7 +114,7 @@ public class App extends Application{
                     buttonTremauxPasAPas.setVisible(true);
                     buttonDeadEndPasaPas.setVisible(true);
                     buttonDeadEnddirect.setVisible(true);
-                });
+                }, Integer.parseInt(vitesse.getText())); // 100 ms de pause pour voir
                 buttonGenerer.setVisible(false);
                 buttonGenererPasAPas.setVisible(false);
                 saisieFieldsBox.setVisible(false);
@@ -207,6 +211,7 @@ public class App extends Application{
         });
         
         root.getChildren().addAll(  saisieBox,scrollPane,infoLabel);
+        
         
 
         primaryStage.setScene(scene);
