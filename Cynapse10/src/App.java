@@ -48,6 +48,9 @@ public class App extends Application{
         buttonTremauxdirect.setVisible(false);
         buttonTremauxPasAPas.setVisible(false);
 
+        Button buttonRetour = new Button("Retour");
+        buttonRetour.setVisible(false);
+
         GridPane gridPane = new GridPane();
         gridPane.setHgap(0);
         gridPane.setVgap(0);
@@ -83,16 +86,26 @@ public class App extends Application{
             try {
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
+
+                // Limite la taille à 50x50
+                if (longueur > 30) longueur = 30;
+                if (largeur > 30) largeur = 30;
+                if (longueur < 1) longueur = 1;
+                if (largeur < 1) largeur = 1;
+
+                longueurField.setText(String.valueOf(longueur));
+                largeurField.setText(String.valueOf(largeur));
+
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
 
-                // Génération directe (bloquante, sans animation d'attente)
                 labyrintheHolder[0].genererLabyrinthe();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
                 buttonDeadEndPasaPas.setVisible(true);
                 buttonDeadEnddirect.setVisible(true);
+                algoButtonsBox.setVisible(true); // <-- Ajoute cette ligne
 
                 buttonGenerer.setVisible(false);
                 saisieFieldsBox.setVisible(false);
@@ -106,6 +119,16 @@ public class App extends Application{
             try {
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
+
+                // Limite la taille à 50x50
+                if (longueur > 30) longueur = 30;
+                if (largeur > 30) largeur = 30;
+                if (longueur < 1) longueur = 1;
+                if (largeur < 1) largeur = 1;
+
+                longueurField.setText(String.valueOf(longueur));
+                largeurField.setText(String.valueOf(largeur));
+
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
                 // Passe un Runnable qui affiche les boutons à la fin
@@ -114,6 +137,7 @@ public class App extends Application{
                     buttonTremauxPasAPas.setVisible(true);
                     buttonDeadEndPasaPas.setVisible(true);
                     buttonDeadEnddirect.setVisible(true);
+                    algoButtonsBox.setVisible(true); // <-- Ajoute cette ligne
                 }, Integer.parseInt(vitesse.getText())); // 100 ms de pause pour voir
                 buttonGenerer.setVisible(false);
                 buttonGenererPasAPas.setVisible(false);
@@ -129,8 +153,8 @@ public class App extends Application{
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.Trémaux, gridPane, infoLabel);
             }
-            
             algoButtonsBox.setVisible(false);
+            buttonRetour.setVisible(true); // <-- ici
         });
 
         // Action du bouton "Trémaux pas à pas"
@@ -140,6 +164,7 @@ public class App extends Application{
                 labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
+            buttonRetour.setVisible(true); // <-- ici
         });
         buttonDeadEndPasaPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
@@ -147,6 +172,7 @@ public class App extends Application{
                 labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
+            buttonRetour.setVisible(true); // <-- ici
         });
         buttonDeadEnddirect.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
@@ -154,11 +180,27 @@ public class App extends Application{
                 labyrintheHolder[0].résoudredirect(Algo.Deadend, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
+            buttonRetour.setVisible(true); // <-- ici
         });
 
-        
+        // Action du bouton "Retour"
+        buttonRetour.setOnAction(event -> {
+            // Réinitialise l'affichage
+            gridPane.getChildren().clear();
+            infoLabel.setText("Statistiques :");
+            buttonRetour.setVisible(false);
 
-       
+            // Réaffiche les champs de saisie et le bouton générer
+            saisieFieldsBox.setVisible(true);
+            buttonGenerer.setVisible(true);
+            buttonGenererPasAPas.setVisible(true);
+
+            // Cache les boutons d'algo
+            algoButtonsBox.setVisible(false);
+
+            // Réautorise la modification
+            modificationAutorisee[0] = true;
+        });
 
         // Champ pour la direction à modifier
         TextField directionField = new TextField();
@@ -166,9 +208,6 @@ public class App extends Application{
         directionField.setVisible(false);
         Label directionLabel = new Label("Entrez la direction à modifier :");
         directionLabel.setVisible(false);
-
-        root.getChildren().add(directionLabel);
-        root.getChildren().add(directionField);
 
         final Case[] selectedCase = new Case[1];
 
@@ -210,7 +249,7 @@ public class App extends Application{
             }
         });
         
-        root.getChildren().addAll(  saisieBox,scrollPane,infoLabel);
+        root.getChildren().addAll(directionLabel, directionField, saisieBox, scrollPane, infoLabel, buttonRetour);
         
         
 
