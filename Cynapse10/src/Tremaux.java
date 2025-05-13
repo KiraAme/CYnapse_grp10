@@ -11,7 +11,7 @@ import java.util.Stack;
 public class Tremaux extends Algorithme {
 
     @Override
-    public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel) {
+    public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel, boolean[] cancelRequested) {
         Case[][] carte = labyrinthe.getCarte();
         int largeur = labyrinthe.getLargeur();
         int longueur = labyrinthe.getLongueur();
@@ -35,8 +35,11 @@ public class Tremaux extends Algorithme {
         // Mesure du temps et compteur de cases parcourues
         long startTime = System.nanoTime();
         int[] casesParcourues = new int[] {0}; // Utilisation d'un tableau pour modification dans la méthode récursive
-
-        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel);
+        if (cancelRequested[0]) {
+            // Arrête la génération/résolution
+            return;
+        }
+        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel, cancelRequested);
     }
 
     @Override
@@ -135,7 +138,7 @@ public class Tremaux extends Algorithme {
         infoLabel.setText("Exploration terminée (pile vide).\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues);
     }
 
-    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel) {
+    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel, boolean[] cancelRequested) {
         if (stack.isEmpty()) {
             long endTime = System.nanoTime();
             infoLabel.setText("Exploration terminée (pile vide).\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
@@ -153,7 +156,10 @@ public class Tremaux extends Algorithme {
                               "\nNombre de cases du chemin final : " + cheminFinal);
             return;
         }
-
+        if (cancelRequested[0]) {
+            // Arrête la génération/résolution
+            return;
+        }
         // Marquer et colorer la case courante
         current.setParcourue(true);
         current.setCouleur(Color.RED);
@@ -212,10 +218,10 @@ public class Tremaux extends Algorithme {
         } else {
             stack.pop();
         }
-
+        
         // Pause avant de continuer
         PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
-        pause.setOnFinished(e -> executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel));
+        pause.setOnFinished(e -> executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel, cancelRequested));
         pause.play();
     }
 

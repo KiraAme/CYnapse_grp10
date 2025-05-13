@@ -15,5 +15,5 @@ public abstract class Algorithme {
      * @param labyrinthe Le labyrinthe à traiter.
      * @param gridPane   Le GridPane pour l'affichage.
      */
-    public abstract void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label label);
+    public abstract void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label label,boolean[] cancelRequested);
 }

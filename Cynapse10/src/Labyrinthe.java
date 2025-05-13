@@ -117,9 +117,11 @@ public class Labyrinthe {
      * @param infoLabel Le Label pour afficher les statistiques.
      * @param onFinish  La fonction à exécuter à la fin de la génération.
      * @param pauseMillis La durée de la pause entre chaque étape en millisecondes.
+     * @param cancelRequested Un tableau de booléens pour annuler la génération.
      */
 
-    public void genererLabyrinthePasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int pauseMillis) {
+
+    public void genererLabyrinthePasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
         this.carte = new Case[this.largeur][this.longueur];
 
         // Initialisation des cases avec tous les murs
@@ -140,7 +142,7 @@ public class Labyrinthe {
         stack.push(this.entree);
 
         long startTime = System.nanoTime();
-        genererEtapePasAPas(gridPane, infoLabel, visitees, stack, startTime, new int[]{0}, onFinish, pauseMillis);
+        genererEtapePasAPas(gridPane, infoLabel, visitees, stack, startTime, new int[]{0}, onFinish, vitesse, cancelRequested);
     }
 
 
@@ -155,8 +157,14 @@ public class Labyrinthe {
      * @param casesCreees Un tableau pour compter les cases créées.
      * @param onFinish  La fonction à exécuter à la fin de la génération.
      * @param pauseMillis La durée de la pause entre chaque étape en millisecondes.
+     * @param cancelRequested Un tableau de booléens pour annuler la génération.
      */
-    private void genererEtapePasAPas(GridPane gridPane, Label infoLabel, boolean[][] visitees, Stack<Case> stack, long startTime, int[] casesCreees, Runnable onFinish, int pauseMillis) {
+    private void genererEtapePasAPas(GridPane gridPane, Label infoLabel, boolean[][] visitees, Stack<Case> stack, long startTime, int[] casesCreees, Runnable onFinish, int pauseMillis, boolean[] cancelRequested) {
+        if (cancelRequested[0]) {
+            Platform.runLater(() -> infoLabel.setText("Génération annulée !"));
+            return;
+        }
+
         if (stack.isEmpty()) {
             this.carte[this.largeur - 1][this.longueur - 1].estSortie = true;
             long endTime = System.nanoTime();
@@ -186,9 +194,9 @@ public class Labyrinthe {
             long now = System.nanoTime();
             infoLabel.setText("Génération en cours...\nTemps : " + String.format("%.3f", (now - startTime) / 1_000_000_000.0) + " s\nCases créées : " + casesCreees[0]);
         });
-
+        
         PauseTransition pause = new PauseTransition(Duration.millis(pauseMillis)); // Vitesse d'animation
-        pause.setOnFinished(e -> genererEtapePasAPas(gridPane, infoLabel, visitees, stack, startTime, casesCreees, onFinish, pauseMillis));
+        pause.setOnFinished(e -> genererEtapePasAPas(gridPane, infoLabel, visitees, stack, startTime, casesCreees, onFinish, pauseMillis, cancelRequested));
         pause.play();
     }
     
@@ -227,7 +235,7 @@ public class Labyrinthe {
      * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
      * @param infoLabel Le Label pour afficher les statistiques.
      */
-    public void résoudrePasAPas(Algo algo, GridPane gridPane, Label infoLabel) {
+    public void résoudrePasAPas(Algo algo, GridPane gridPane, Label infoLabel,boolean[] cancelRequested) {
         Algorithme algorithme = null;
 
         switch (algo) {
@@ -245,7 +253,7 @@ public class Labyrinthe {
                 return;
         }
 
-        algorithme.algoPasAPas(this, gridPane, infoLabel);
+        algorithme.algoPasAPas(this, gridPane, infoLabel, cancelRequested);
     }
 
     /**

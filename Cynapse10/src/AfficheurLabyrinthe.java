@@ -5,7 +5,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class AfficheurLabyrinthe {
-    private static final int TILE_SIZE = 20;
+    private static final int TILE_SIZE = 30; 
+
     /**
      * Affiche le labyrinthe dans le GridPane donné.
      *
@@ -15,8 +16,15 @@ public class AfficheurLabyrinthe {
     public static void afficherLabyrinthe(GridPane gridPane, Labyrinthe labyrinthe) {
         gridPane.getChildren().clear();
 
-        for (int x = 0; x < labyrinthe.getLargeur(); x++) {
-            for (int y = 0; y < labyrinthe.getLongueur(); y++) {
+        int nbLignes = labyrinthe.getLargeur();
+        int nbColonnes = labyrinthe.getLongueur();
+
+        // Fixe la taille du GridPane pour qu'il affiche tout le labyrinthe sans scroll
+        gridPane.setPrefWidth(nbColonnes * TILE_SIZE);
+        gridPane.setPrefHeight(nbLignes * TILE_SIZE);
+
+        for (int x = 0; x < nbLignes; x++) {
+            for (int y = 0; y < nbColonnes; y++) {
                 Case currentCase = labyrinthe.getCarte()[x][y];
                 StackPane stackPane = new StackPane();
                 stackPane.setPrefSize(TILE_SIZE, TILE_SIZE);
@@ -27,11 +35,11 @@ public class AfficheurLabyrinthe {
                     rectangle.setFill(Color.BLUE);
                 } else if (currentCase.estSortie) {
                     rectangle.setFill(Color.GREEN);
-                } else if (currentCase.getCouleur()==Color.RED) {
+                } else if (currentCase.getCouleur() == Color.RED) {
                     rectangle.setFill(Color.RED);
-                } else if (currentCase.getCouleur()==Color.PINK) {
+                } else if (currentCase.getCouleur() == Color.PINK) {
                     rectangle.setFill(Color.PINK);
-                }else if (currentCase.getCouleur()==Color.YELLOW) {
+                } else if (currentCase.getCouleur() == Color.YELLOW) {
                     rectangle.setFill(Color.YELLOW);
                 } else {
                     rectangle.setFill(Color.WHITE);

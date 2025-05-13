@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -21,6 +22,7 @@ public class App extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception {
         VBox root = new VBox();
+        final boolean[] cancelRequested = {false};
         primaryStage.setTitle("Générateur de Labyrinthe");
         Scene scene = new Scene(root,1000, 1000); // Agrandis la fenêtre pour le zoom
 
@@ -84,10 +86,11 @@ public class App extends Application{
         // Action du bouton "Générer"
         buttonGenerer.setOnMouseClicked(event -> {
             try {
+                cancelRequested[0] = false;
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
 
-                // Limite la taille à 50x50
+                // Limite la taille à 30x30
                 if (longueur > 30) longueur = 30;
                 if (largeur > 30) largeur = 30;
                 if (longueur < 1) longueur = 1;
@@ -105,7 +108,8 @@ public class App extends Application{
                 buttonTremauxPasAPas.setVisible(true);
                 buttonDeadEndPasaPas.setVisible(true);
                 buttonDeadEnddirect.setVisible(true);
-                algoButtonsBox.setVisible(true); // <-- Ajoute cette ligne
+                algoButtonsBox.setVisible(true);
+                modificationAutorisee[0] = true; // <-- Ajoute cette ligne
 
                 buttonGenerer.setVisible(false);
                 saisieFieldsBox.setVisible(false);
@@ -117,10 +121,11 @@ public class App extends Application{
         // Action du bouton "Générer pas à pas"
         buttonGenererPasAPas.setOnMouseClicked(event -> {
             try {
+                cancelRequested[0] = false;
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
 
-                // Limite la taille à 50x50
+                // Limite la taille à  30x30
                 if (longueur > 30) longueur = 30;
                 if (largeur > 30) largeur = 30;
                 if (longueur < 1) longueur = 1;
@@ -137,9 +142,11 @@ public class App extends Application{
                     buttonTremauxPasAPas.setVisible(true);
                     buttonDeadEndPasaPas.setVisible(true);
                     buttonDeadEnddirect.setVisible(true);
-                    algoButtonsBox.setVisible(true); // <-- Ajoute cette ligne
-                }, Integer.parseInt(vitesse.getText())); // 100 ms de pause pour voir
+                    algoButtonsBox.setVisible(true);
+                    modificationAutorisee[0] = true; 
+                }, Integer.parseInt(vitesse.getText()), cancelRequested); 
                 buttonGenerer.setVisible(false);
+                buttonRetour.setVisible(true); 
                 buttonGenererPasAPas.setVisible(false);
                 saisieFieldsBox.setVisible(false);
             } catch (NumberFormatException e) {
@@ -161,7 +168,7 @@ public class App extends Application{
         buttonTremauxPasAPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
-                labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel);
+                labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true); // <-- ici
@@ -169,7 +176,7 @@ public class App extends Application{
         buttonDeadEndPasaPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
-                labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel);
+                labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true); // <-- ici
@@ -186,6 +193,8 @@ public class App extends Application{
         // Action du bouton "Retour"
         buttonRetour.setOnAction(event -> {
             // Réinitialise l'affichage
+            cancelRequested[0] = true;
+            modificationAutorisee[0] = false;
             gridPane.getChildren().clear();
             infoLabel.setText("Statistiques :");
             buttonRetour.setVisible(false);
@@ -198,8 +207,6 @@ public class App extends Application{
             // Cache les boutons d'algo
             algoButtonsBox.setVisible(false);
 
-            // Réautorise la modification
-            modificationAutorisee[0] = true;
         });
 
         // Champ pour la direction à modifier
@@ -215,24 +222,24 @@ public class App extends Application{
         gridPane.setOnMouseClicked(event -> {
             if (!modificationAutorisee[0]) return; // Bloque la modification si un algo a été lancé
 
-            double scale = gridPane.getScaleX();
-            double mouseX = event.getX() / scale;
-            double mouseY = event.getY() / scale;
+                double scale = gridPane.getScaleX();
+                double mouseX = event.getX() / scale;
+                double mouseY = event.getY() / scale;
 
-            double cellWidth = gridPane.getWidth() / labyrintheHolder[0].getLongueur();
-            double cellHeight = gridPane.getHeight() / labyrintheHolder[0].getLargeur();
+                double cellWidth = gridPane.getWidth() / labyrintheHolder[0].getLongueur();
+                double cellHeight = gridPane.getHeight() / labyrintheHolder[0].getLargeur();
 
-            int col = (int) Math.floor(mouseX / cellWidth);
-            int row = (int) Math.floor(mouseY / cellHeight);
+                int col = (int) Math.floor(mouseX / cellWidth);
+                int row = (int) Math.floor(mouseY / cellHeight);
 
-            Labyrinthe lab = labyrintheHolder[0];
-            if (lab != null && lab.getCarte() != null && lab.isInBounds(row, col)) {
-                selectedCase[0] = lab.getCarte()[row][col];
-                directionField.setVisible(true);
-                directionLabel.setVisible(true);
-                directionField.clear();
-                directionField.requestFocus();
-            }
+                Labyrinthe lab = labyrintheHolder[0];
+                if (lab != null && lab.getCarte() != null && lab.isInBounds(row, col)) {
+                    selectedCase[0] = lab.getCarte()[row][col];
+                    directionField.setVisible(true);
+                    directionLabel.setVisible(true);
+                    directionField.clear();
+                    directionField.requestFocus();
+                }
         });
 
         // Quand l'utilisateur entre une direction et appuie sur Entrée
@@ -248,8 +255,9 @@ public class App extends Application{
                 directionField.setPromptText("Nord, Sud, Est ou Ouest");
             }
         });
-        
-        root.getChildren().addAll(directionLabel, directionField, saisieBox, scrollPane, infoLabel, buttonRetour);
+        HBox labyBox = new HBox(gridPane, saisieBox);
+        labyBox.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(directionLabel, directionField, labyBox, infoLabel, buttonRetour);
         
         
 
