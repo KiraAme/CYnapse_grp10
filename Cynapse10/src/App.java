@@ -153,6 +153,12 @@ public class App extends Application{
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
         });
+        // Champ pour la direction à modifier
+        TextField directionField = new TextField();
+        directionField.setPromptText("Nord, Sud, Est ou Ouest");
+        directionField.setVisible(false);
+        Label directionLabel = new Label("Entrez la direction à modifier :");
+        directionLabel.setVisible(false);
 
         // Action du bouton "Trémaux"
         buttonTremauxdirect.setOnMouseClicked(event -> {
@@ -161,7 +167,9 @@ public class App extends Application{
                 labyrintheHolder[0].résoudredirect(Algo.Trémaux, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
-            buttonRetour.setVisible(true); // <-- ici
+            buttonRetour.setVisible(true);
+            directionField.setVisible(false);
+            directionLabel.setVisible(false);
         });
 
         // Action du bouton "Trémaux pas à pas"
@@ -171,7 +179,9 @@ public class App extends Application{
                 labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
-            buttonRetour.setVisible(true); // <-- ici
+            buttonRetour.setVisible(true); 
+            directionField.setVisible(false);
+            directionLabel.setVisible(false);
         });
         buttonDeadEndPasaPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
@@ -179,7 +189,9 @@ public class App extends Application{
                 labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
-            buttonRetour.setVisible(true); // <-- ici
+            buttonRetour.setVisible(true); 
+            directionField.setVisible(false);
+            directionLabel.setVisible(false);
         });
         buttonDeadEnddirect.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
@@ -187,7 +199,9 @@ public class App extends Application{
                 labyrintheHolder[0].résoudredirect(Algo.Deadend, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
-            buttonRetour.setVisible(true); // <-- ici
+            buttonRetour.setVisible(true);
+            directionField.setVisible(false);
+            directionLabel.setVisible(false);
         });
 
         // Action du bouton "Retour"
@@ -209,12 +223,7 @@ public class App extends Application{
 
         });
 
-        // Champ pour la direction à modifier
-        TextField directionField = new TextField();
-        directionField.setPromptText("Nord, Sud, Est ou Ouest");
-        directionField.setVisible(false);
-        Label directionLabel = new Label("Entrez la direction à modifier :");
-        directionLabel.setVisible(false);
+        
 
         final Case[] selectedCase = new Case[1];
 

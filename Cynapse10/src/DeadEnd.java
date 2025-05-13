@@ -29,11 +29,11 @@ public class DeadEnd extends Algorithme {
         Stack<Case> stack = new Stack<>(); // récupérér les deadends
 
         long startTime = System.nanoTime();
-        int casesParcourues = 0;
+        final int[] casesParcourues = {0};
 
         for (int i=0; i<longueur;i++){
             for (int j=0; j<largeur; j++){
-                casesParcourues++;
+                
                 Case current = carte[j][i];
                 int murs = 0;
                 if(!current.isEstEntree() && !current.isEstSortie()){
@@ -62,7 +62,7 @@ public class DeadEnd extends Algorithme {
             // Arrête la génération/résolution
             return;
         }
-        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel,cancelRequested);
+        executerEtapePasAPas(labyrinthe, gridPane, carte, passages, stack, largeur, longueur, sortie, startTime,casesParcourues, infoLabel,cancelRequested);
     }
 
     @Override
@@ -82,13 +82,13 @@ public class DeadEnd extends Algorithme {
         int j;
 
         long startTime = System.nanoTime();
-        int casesParcourues = 0;
+        int[] casesParcourues = {0};
 
 
         Stack<Case> stack = new Stack<>(); // récupérér les deadends
         for (i=0; i<longueur;i++){
             for (j=0; j<largeur; j++){
-                casesParcourues++;
+                casesParcourues[0]++;
                 Case current = carte[j][i];
                 int murs = 0;
                 if(!current.isEstEntree() && !current.isEstSortie()){
@@ -116,7 +116,7 @@ public class DeadEnd extends Algorithme {
 
         while (!stack.isEmpty()) {
             Case current = stack.pop();
-            casesParcourues++;
+            casesParcourues[0]++;
             int x = current.getX();
             int y = current.getY();
           
@@ -162,10 +162,10 @@ public class DeadEnd extends Algorithme {
         }
         long endTime = System.nanoTime();
         int cheminFinal = afficherChemin(labyrinthe, sortie, gridPane);
-        infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues + "\nNombre de cases du chemin final : " + cheminFinal);
+        infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
     }
 
-    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int casesParcourues, Label infoLabel,boolean[] cancelRequested) {
+    private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel,boolean[] cancelRequested) {
         if (stack.isEmpty()) {
             long endTime = System.nanoTime();
             int cheminFinal = afficherChemin(labyrinthe, sortie, gridPane);
@@ -180,10 +180,15 @@ public class DeadEnd extends Algorithme {
             return;
         }
 
+
         // Marquer et colorer la case courante
         current.setCouleur(Color.RED);
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
         current.setCouleur(Color.WHITE);
+        casesParcourues[0]++;
+        // Affichage en direct
+        long now = System.nanoTime();
+        infoLabel.setText("En cours...\nTemps d'exécution : " + ((now - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
 
         // Obtenir les voisins disponibles
         int voisins = 0;
