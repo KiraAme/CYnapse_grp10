@@ -89,6 +89,8 @@ public class Labyrinthe {
         this.entree = this.carte[0][0];
         this.sortie = this.carte[this.largeur - 1][this.longueur - 1];
         this.entree.estEntree = true;
+        this.sortie.murEst = false;
+        this.entree.murOuest = false; 
         visitees[0][0] = true;
         stack.push(this.entree);
 
@@ -131,6 +133,8 @@ public class Labyrinthe {
         Stack<Case> stack = new Stack<>();
         this.entree = this.carte[0][0];
         this.sortie = this.carte[this.largeur - 1][this.longueur - 1];
+        this.sortie.murEst = false;
+        this.entree.murOuest = false; 
         this.entree.estEntree = true;
         visitees[0][0] = true;
         stack.push(this.entree);

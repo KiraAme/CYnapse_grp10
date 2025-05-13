@@ -116,38 +116,46 @@ public class DeadEnd extends Algorithme {
             casesParcourues++;
             int x = current.getX();
             int y = current.getY();
-            if (current == sortie || current == entree) {
+          
+
+           // Obtenir les voisins disponibles
+            int voisins = 0;
+            List<Case> voisinsDisponibles = new ArrayList<>();
+            // Récupérer les cases non visitées
+            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
+                voisinsDisponibles.add(carte[x - 1][y]);
+                voisins++;
+            }
+            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 0) {
+                    voisinsDisponibles.add(carte[x + 1][y]);
+                    voisins++;
+            }
+            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 0) {
+                    voisinsDisponibles.add(carte[x][y - 1]);
+                    voisins++;
+            }
+            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 0) {
+                voisinsDisponibles.add(carte[x][y + 1]);
+                voisins++;
+            }
+            if(current.isEstEntree() || current.isEstSortie()){
+                voisins++;
+            }
+            if(voisins==1){ //si la case n'est pas une intersection
+                current.setParcourue(true);                    
+                current.setCouleur(Color.YELLOW);
+                if(!voisinsDisponibles.isEmpty()){
+                    Case next = voisinsDisponibles.get(0);
+                    stack.push(next);
+                    passages[x][y]++;
+                }
+            }
+            if (voisins<=1 && (current == sortie || current == entree)) {//si l'entrée ou la sortie mène à un cul de sac
                 long endTime = System.nanoTime();
                 infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues );
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
                 return;
             }
-
-            // Obtenir les voisins disponibles
-            List<Case> voisinsDisponibles = new ArrayList<>();
-
-            // Récupérer les cases non visitées
-            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
-                voisinsDisponibles.add(carte[x - 1][y]);
-            }
-            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 0) {
-                voisinsDisponibles.add(carte[x + 1][y]);
-            }
-            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 0) {
-                voisinsDisponibles.add(carte[x][y - 1]);
-            }
-            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 0) {
-                voisinsDisponibles.add(carte[x][y + 1]);
-            }
-            if (!voisinsDisponibles.isEmpty()) {
-                if(voisinsDisponibles.size()==1){ //si la case n'est pas une intersection
-                    current.setParcourue(true);
-                    current.setCouleur(Color.YELLOW);
-                    Case next = voisinsDisponibles.get(0);
-                    stack.push(next);
-                    passages[x][y]++;
-                }
-            } 
         }
         long endTime = System.nanoTime();
         int cheminFinal = afficherChemin(labyrinthe, sortie, gridPane);
@@ -164,45 +172,54 @@ public class DeadEnd extends Algorithme {
 
         Case current = stack.pop();
         Case entree = labyrinthe.getEntree();
-        // Si la sortie  ou l'entrée mène à un cul de sac
-        if (current == sortie || current == entree) {
-                long endTime = System.nanoTime();
-                infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues );
-                AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
-                return;
-        }
+
 
         // Marquer et colorer la case courante
         current.setCouleur(Color.RED);
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
-        current.setCouleur(Color.YELLOW);
+        current.setCouleur(Color.WHITE);
 
         // Obtenir les voisins disponibles
+        int voisins = 0;
         List<Case> voisinsDisponibles = new ArrayList<>();
         int x = current.getX();
         int y = current.getY();
         // Récupérer les cases non visitées
         if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
             voisinsDisponibles.add(carte[x - 1][y]);
+            voisins++;
         }
         if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && passages[x + 1][y] == 0) {
                 voisinsDisponibles.add(carte[x + 1][y]);
+                voisins++;
         }
         if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && passages[x][y - 1] == 0) {
                 voisinsDisponibles.add(carte[x][y - 1]);
+                voisins++;
         }
         if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && passages[x][y + 1] == 0) {
             voisinsDisponibles.add(carte[x][y + 1]);
+            voisins++;
         }
-        if (!voisinsDisponibles.isEmpty()) {
-            if(voisinsDisponibles.size()==1){ //si la case n'est pas une intersection
-                current.setParcourue(true);                    
-                current.setCouleur(Color.YELLOW);
+        if(current.isEstEntree() || current.isEstSortie()){
+            voisins++;
+        }
+        if(voisins==1){ //si la case n'est pas une intersection
+            current.setParcourue(true);                    
+            current.setCouleur(Color.YELLOW);
+            if(!voisinsDisponibles.isEmpty()){
                 Case next = voisinsDisponibles.get(0);
                 stack.push(next);
                 passages[x][y]++;
             }
-        } 
+        }
+        if (voisins<=1 && (current == sortie || current == entree)) {//si l'entrée ou la sortie mène à un cul de sac
+            long endTime = System.nanoTime();
+            infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues );
+            AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+            return;
+        }
+         
 
         // Pause avant de continuer
         PauseTransition pause = new PauseTransition(Duration.seconds(0.1));
