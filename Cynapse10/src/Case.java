@@ -11,6 +11,7 @@ public class Case {
     public boolean estEntree;
     public boolean parcourue;
     private Color couleur = Color.WHITE; // Couleur par défaut
+    private int distance;
 
 
     /**
@@ -34,9 +35,22 @@ public class Case {
         this.estSortie=estS;
         this.estEntree=estE;
         this.parcourue = false;
+        this.distance=(this.estEntree)?0:Integer.MAX_VALUE;
+        
         
     }
-
+    /**
+     * @return la distance au noeud de départ (pour dijkstra) initialisée à 0
+     */
+    public int getDistance() {
+        return this.distance;
+    }
+    /**
+     * @param la distance au noeud de départ (pour dijkstra) initialisée à 0
+     */
+    public void setDistance(int distance) {
+        this.distance=distance;
+    }
     /**
      * @return la position x
      */

@@ -45,10 +45,14 @@ public class App extends Application{
         Button buttonTremauxPasAPas = new Button("Trémaux version pas a pas");
         Button buttonDeadEndPasaPas = new Button("DeadEnd version Pas a Pas");
         Button buttonDeadEnddirect = new Button("DeadEnd version directe");
+        Button buttonDijkstraPasAPas = new Button("Dijkstra version Pas a Pas");
+        Button buttonDijkstradirect = new Button("Dijkstra version directe");
         buttonDeadEndPasaPas.setVisible(false);
         buttonDeadEnddirect.setVisible(false);
         buttonTremauxdirect.setVisible(false);
         buttonTremauxPasAPas.setVisible(false);
+        buttonDijkstraPasAPas.setVisible(false);
+        buttonDijkstradirect.setVisible(false);
 
         Button buttonRetour = new Button("Retour");
         buttonRetour.setVisible(false);
@@ -76,7 +80,7 @@ public class App extends Application{
         );
         saisieFieldsBox.setAlignment(Pos.CENTER_LEFT);
 
-        VBox algoButtonsBox = new VBox(5, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect, buttonDeadEndPasaPas);
+        VBox algoButtonsBox = new VBox(7, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect, buttonDeadEndPasaPas, buttonDijkstradirect, buttonDijkstraPasAPas);
         algoButtonsBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox saisieBox = new VBox(5, 
@@ -108,6 +112,8 @@ public class App extends Application{
                 buttonTremauxPasAPas.setVisible(true);
                 buttonDeadEndPasaPas.setVisible(true);
                 buttonDeadEnddirect.setVisible(true);
+                buttonDijkstraPasAPas.setVisible(true);
+                buttonDijkstradirect.setVisible(true);
                 algoButtonsBox.setVisible(true);
                 modificationAutorisee[0] = true; // <-- Ajoute cette ligne
 
@@ -142,6 +148,8 @@ public class App extends Application{
                     buttonTremauxPasAPas.setVisible(true);
                     buttonDeadEndPasaPas.setVisible(true);
                     buttonDeadEnddirect.setVisible(true);
+                    buttonDijkstraPasAPas.setVisible(true);
+                    buttonDijkstradirect.setVisible(true);
                     algoButtonsBox.setVisible(true);
                     modificationAutorisee[0] = true; 
                 }, Integer.parseInt(vitesse.getText()), cancelRequested); 
@@ -197,6 +205,26 @@ public class App extends Application{
             modificationAutorisee[0] = false;
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.Deadend, gridPane, infoLabel);
+            }
+            algoButtonsBox.setVisible(false);
+            buttonRetour.setVisible(true);
+            directionField.setVisible(false);
+            directionLabel.setVisible(false);
+        });
+        buttonDijkstraPasAPas.setOnMouseClicked(event -> {
+            modificationAutorisee[0] = false;
+            if (labyrintheHolder[0] != null) {
+                labyrintheHolder[0].résoudrePasAPas(Algo.ShortestPath, gridPane, infoLabel, cancelRequested);
+            }
+            algoButtonsBox.setVisible(false);
+            buttonRetour.setVisible(true); 
+            directionField.setVisible(false);
+            directionLabel.setVisible(false);
+        });
+        buttonDijkstradirect.setOnMouseClicked(event -> {
+            modificationAutorisee[0] = false;
+            if (labyrintheHolder[0] != null) {
+                labyrintheHolder[0].résoudredirect(Algo.ShortestPath, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);

@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -218,8 +219,8 @@ public class Labyrinthe {
                 algorithme = new DeadEnd();
                 break;
             case ShortestPath:
-                System.out.println("Algorithme ShortestPath pas encore implémenté.");
-                return;
+                algorithme = new Dijkstra();
+                break;
             default:
                 System.out.println("Algorithme non reconnu.");
                 return;
@@ -246,8 +247,8 @@ public class Labyrinthe {
                 algorithme = new DeadEnd();
                 break;
             case ShortestPath:
-                System.out.println("Algorithme ShortestPath pas encore implémenté.");
-                return;
+                algorithme = new Dijkstra();
+                break;
             default:
                 System.out.println("Algorithme non reconnu.");
                 return;
@@ -351,6 +352,22 @@ public class Labyrinthe {
                 // Ne rien faire si la direction n'est pas reconnue
                 break;
         }
+    }
+
+    public void reset(){
+        int longueur = this.getLongueur();
+        int largeur  = this.getLargeur();
+        Case[][] carte = this.getCarte();
+        for (int i=0; i<largeur;i++){
+            for (int j=0;j<longueur;j++){
+                carte[i][j].setDistance(Integer.MAX_VALUE);
+                carte[i][j].setCouleur(Color.WHITE);
+                carte[i][j].setParcourue(false);
+            }
+        }
+        this.getEntree().setCouleur(Color.BLUE);
+        this.getEntree().setDistance(0);
+        this.getEntree().setCouleur(Color.GREEN);
     }
     
 }
