@@ -74,7 +74,19 @@ public class Dijkstra extends Algorithme {
             if (current==sortie){
                 long endTime = System.nanoTime();
                 int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
-                infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
+                if (infoLabel != null) {
+                    infoLabel.setText(
+                        "Sortie trouvée !\n" +
+                        "Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\n" +
+                        "Nombre de cases parcourues : " + casesParcourues[0] + "\n" +
+                        "Nombre de cases du chemin final : " + cheminFinal
+                    );
+                } else {
+                    System.out.println("Sortie trouvée !");
+                    System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+                    System.out.println("Nombre de cases parcourues : " + casesParcourues[0]);
+                    System.out.println("Nombre de cases du chemin final : " + cheminFinal);
+                }
                 return;
             }
 
@@ -114,15 +126,35 @@ public class Dijkstra extends Algorithme {
             }
         }
         long endTime = System.nanoTime();
-        infoLabel.setText("Pas de chemin trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
-        AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+        if (infoLabel != null) {
+            infoLabel.setText("Pas de chemin trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
+        } else {
+            System.out.println("Pas de chemin trouvé.");
+            System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+            System.out.println("Nombre de cases parcourues : " + casesParcourues[0]);
+        }
+        if (gridPane != null) {
+            AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+        } else {
+            System.out.println(labyrinthe.toString());
+        }
     }
 
     private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, Case[][] pred, PriorityQueue<Case> file,int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel,boolean[] cancelRequested) {
         if (file.isEmpty()) {
             long endTime = System.nanoTime();
-            infoLabel.setText("Pas de chemin trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
-            AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+            if (infoLabel != null) {
+                infoLabel.setText("Pas de chemin trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
+            } else {
+                System.out.println("Pas de chemin trouvé.");
+                System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+                System.out.println("Nombre de cases parcourues : " + casesParcourues[0]);
+            }
+            if (gridPane != null) {
+                AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+            } else {
+                System.out.println(labyrinthe.toString());
+            }
             return;
         }
         
@@ -145,7 +177,19 @@ public class Dijkstra extends Algorithme {
             if (current==sortie){
                 long endTime = System.nanoTime();
                 int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
-                infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
+                if (infoLabel != null) {
+                    infoLabel.setText(
+                        "Sortie trouvée !\n" +
+                        "Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\n" +
+                        "Nombre de cases parcourues : " + casesParcourues[0] + "\n" +
+                        "Nombre de cases du chemin final : " + cheminFinal
+                    );
+                } else {
+                    System.out.println("Sortie trouvée !");
+                    System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+                    System.out.println("Nombre de cases parcourues : " + casesParcourues[0]);
+                    System.out.println("Nombre de cases du chemin final : " + cheminFinal);
+                }
                 return;
             }
 
@@ -243,12 +287,17 @@ public class Dijkstra extends Algorithme {
             } else if (c == sortie) {
                 c.setCouleur(Color.GREEN);     // Sortie en vert
             } else {
-                c.setCouleur(Color.YELLOW);      // Chemin en rose
+                c.setCouleur(Color.YELLOW);    // Chemin en jaune
             }
         }
 
         // Rafraîchir l'affichage
-        AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+        if (gridPane != null) {
+            AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
+        } else {
+            // Version terminale : affichage ASCII avec chemin
+            System.out.println(labyrinthe.toString());
+        }
 
         return chemin.size();
     }

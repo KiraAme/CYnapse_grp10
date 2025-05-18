@@ -14,6 +14,12 @@ public class AfficheurLabyrinthe {
      * @param labyrinthe Le labyrinthe à afficher.
      */
     public static void afficherLabyrinthe(GridPane gridPane, Labyrinthe labyrinthe) {
+        if (gridPane == null) {
+            // Version terminale : affiche le labyrinthe en ASCII
+            System.out.println(labyrinthe);
+            return;
+        }
+
         gridPane.getChildren().clear();
 
         int nbLignes = labyrinthe.getLargeur();

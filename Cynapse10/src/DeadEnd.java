@@ -153,16 +153,34 @@ public class DeadEnd extends Algorithme {
                     passages[x][y]++;
                 }
             }
-            if (voisins<=1 && (current == sortie || current == entree)) {//si l'entrée ou la sortie mène à un cul de sac
+            if (voisins<=1 && (current == sortie || current == entree)) { //si l'entrée ou la sortie mène à un cul de sac
                 long endTime = System.nanoTime();
-                infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues );
+                if (infoLabel != null) {
+                    infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
+                } else {
+                    System.out.println("Pas de passage trouvé.");
+                    System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+                    System.out.println("Nombre de cases parcourues : " + casesParcourues[0]);
+                }
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
                 return;
             }
         }
         long endTime = System.nanoTime();
         int cheminFinal = afficherChemin(labyrinthe, sortie, gridPane);
-        infoLabel.setText("Sortie trouvée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
+        if (infoLabel != null) {
+            infoLabel.setText(
+                "Sortie trouvée !\n" +
+                "Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\n" +
+                "Nombre de cases parcourues : " + casesParcourues[0] + "\n" +
+                "Nombre de cases du chemin final : " + cheminFinal
+            );
+        } else {
+            System.out.println("Sortie trouvée !");
+            System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+            System.out.println("Nombre de cases parcourues : " + casesParcourues[0]);
+            System.out.println("Nombre de cases du chemin final : " + cheminFinal);
+        }
     }
 
     private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel,boolean[] cancelRequested) {
@@ -226,7 +244,9 @@ public class DeadEnd extends Algorithme {
         }
         if (voisins<=1 && (current == sortie || current == entree)) {//si l'entrée ou la sortie mène à un cul de sac
             long endTime = System.nanoTime();
+
             infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues );
+
             AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
             return;
         }
@@ -292,7 +312,7 @@ public class DeadEnd extends Algorithme {
         if (current == sortie) {
             chemin.add(sortie);
         }
-    
+        labyrinthe.reset();
         // Colorer uniquement le chemin trouvé
         for (Case c : chemin) {
             if (c == entree) {
@@ -300,7 +320,7 @@ public class DeadEnd extends Algorithme {
             } else if (c == sortie) {
                 c.setCouleur(Color.GREEN);     // Sortie en vert
             } else {
-                c.setCouleur(Color.PINK);      // Chemin en rose
+                c.setCouleur(Color.YELLOW);      // Chemin en jaune
             }
         }
     

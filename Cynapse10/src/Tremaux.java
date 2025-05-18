@@ -79,12 +79,19 @@ public class Tremaux extends Algorithme {
             if (current == sortie) {
                 long endTime = System.nanoTime();
                 int cheminFinal = afficherChemin(labyrinthe, pred, sortie, gridPane);
-                infoLabel.setText(
-                    "Sortie trouvée !\n" +
-                    "Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\n" +
-                    "Nombre de cases parcourues : " + casesParcourues + "\n" +
-                    "Nombre de cases du chemin final : " + cheminFinal
-                );
+                if (infoLabel != null) {
+                    infoLabel.setText(
+                        "Sortie trouvée !\n" +
+                        "Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\n" +
+                        "Nombre de cases parcourues : " + casesParcourues + "\n" +
+                        "Nombre de cases du chemin final : " + cheminFinal
+                    );
+                } else {
+                    System.out.println("Sortie trouvée !");
+                    System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+                    System.out.println("Nombre de cases parcourues : " + casesParcourues);
+                    System.out.println("Nombre de cases du chemin final : " + cheminFinal);
+                }
                 return;
             }
 
@@ -135,7 +142,13 @@ public class Tremaux extends Algorithme {
         }
         // Si la pile est vide sans trouver la sortie
         long endTime = System.nanoTime();
-        infoLabel.setText("Exploration terminée (pile vide).\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues);
+        if (infoLabel != null) {
+            infoLabel.setText("Exploration terminée (pile vide).\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues);
+        } else {
+            System.out.println("Exploration terminée (pile vide).");
+            System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
+            System.out.println("Nombre de cases parcourues : " + casesParcourues);
+        }
     }
 
     private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel, boolean[] cancelRequested) {

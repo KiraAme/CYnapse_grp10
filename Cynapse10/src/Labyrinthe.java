@@ -265,18 +265,24 @@ public class Labyrinthe {
         StringBuilder sb = new StringBuilder();
 
         for (int x = 0; x < this.largeur; x++) {
+            // Ligne des murs nord
             for (int y = 0; y < this.longueur; y++) {
                 sb.append("+");
                 sb.append(this.carte[x][y].murNord ? "---" : "   ");
             }
             sb.append("+\n");
 
+            // Ligne des cases
             for (int y = 0; y < this.longueur; y++) {
                 sb.append(this.carte[x][y].murOuest ? "| " : "  ");
                 if (this.carte[x][y].estEntree) {
                     sb.append("E ");
                 } else if (this.carte[x][y].estSortie) {
                     sb.append("S ");
+                } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.YELLOW)) {
+                    sb.append("* "); // Chemin final
+                } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.RED)) {
+                    sb.append(". "); // Cases parcourues mais pas sur le chemin final
                 } else {
                     sb.append("  ");
                 }
@@ -284,6 +290,7 @@ public class Labyrinthe {
             sb.append("|\n");
         }
 
+        // Dernière ligne de murs sud
         for (int y = 0; y < this.longueur; y++) {
             sb.append("+---");
         }
