@@ -11,10 +11,10 @@ public class AppTerminal {
 
         // Saisie sécurisée de la longueur
         while (true) {
-            System.out.print("Longueur (max 50) : ");
+            System.out.print("Longueur (max 30) : ");
             if (scanner.hasNextInt()) {
                 longueur = scanner.nextInt();
-                if (longueur >= 1 && longueur <= 50) break;
+                if (longueur >= 1 && longueur <= 30) break;
             } else {
                 scanner.next(); // Consomme l'entrée invalide
             }
@@ -23,7 +23,7 @@ public class AppTerminal {
 
         // Saisie sécurisée de la largeur
         while (true) {
-            System.out.print("Largeur (max 50) : ");
+            System.out.print("Largeur (max 30) : ");
             if (scanner.hasNextInt()) {
                 largeur = scanner.nextInt();
                 if (largeur >= 1 && largeur <= 50) break;
@@ -48,7 +48,23 @@ public class AppTerminal {
         if (seed == 0) seed = System.currentTimeMillis();
 
         Labyrinthe lab = new Labyrinthe("Terminal", longueur, largeur, seed);
-        lab.genererLabyrinthe();
+        // Demande labyrinthe parfait ou imparfait
+        boolean parfait = true;
+        while (true) {
+            System.out.print("Labyrinthe parfait (sans boucle) ? (o/n) : ");
+            String rep = scanner.next().trim().toLowerCase();
+            if (rep.equals("o")) {
+                parfait = true;
+                lab.genererLabyrinthe();
+                break;
+            } else if (rep.equals("n")) {
+                parfait = false;
+                lab.genererImparfait();
+                break;
+            } else {
+                System.out.println("Veuillez répondre par 'o' ou 'n'.");
+            }
+        }
 
         System.out.println("\nLabyrinthe généré :\n");
         System.out.println(lab);
@@ -88,8 +104,8 @@ public class AppTerminal {
             while (true) {
                 System.out.print("Mur à modifier (nord/sud/est/ouest) : ");
                 direction = scanner.nextLine().trim().toLowerCase();
-                if (direction.equals("nord") || direction.equals("sud") || direction.equals("est") || direction.equals("ouest")) break;
-                System.out.println("Veuillez entrer 'nord', 'sud', 'est' ou 'ouest'.");
+                if (direction.equals("n") || direction.equals("s") || direction.equals("e") || direction.equals("o")) break;
+                System.out.println("Veuillez entrer 'n', 's', 'e' ou 'o'.");
             }
 
             lab.modifierLabyrinthe(lab.getCarte()[x][y], direction);
@@ -131,6 +147,8 @@ public class AppTerminal {
 
         System.out.println("\nLabyrinthe après résolution :\n");
         System.out.println(lab);
+
+        
 
         System.out.println("Fin.");
         scanner.close();

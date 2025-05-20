@@ -289,13 +289,14 @@ public class Labyrinthe {
      * Affiche le labyrinthe sous forme de chaîne de caractères.
      */
     @Override
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         // Ligne des indices y (colonnes)
         sb.append("    ");
         for (int y = 0; y < this.longueur; y++) {
-            sb.append(String.format("%-3d", y));
+            sb.append(" "+String.format("%-3d", y));
         }
         sb.append("\n");
 
