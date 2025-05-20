@@ -107,11 +107,18 @@ public class AppTerminal {
                 if (direction.equals("n") || direction.equals("s") || direction.equals("e") || direction.equals("o")) break;
                 System.out.println("Veuillez entrer 'n', 's', 'e' ou 'o'.");
             }
+            if (direction.equals("n")) direction = "nord";
+            if (direction.equals("s")) direction = "sud";
+            if (direction.equals("e")) direction = "est";
+            if (direction.equals("o")) direction = "ouest";
 
             lab.modifierLabyrinthe(lab.getCarte()[x][y], direction);
             System.out.println("Labyrinthe modifié :");
             System.out.println(lab);
-
+            System.out.println("Historique des modifications :");
+            for (String ligne : lab.getHistorique()) {
+                System.out.println(ligne);
+            }
             System.out.print("Modifier une autre case ? (o/n) : ");
             modif = scanner.nextLine();
         }

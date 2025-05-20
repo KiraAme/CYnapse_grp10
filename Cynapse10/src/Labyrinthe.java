@@ -18,7 +18,15 @@ public class Labyrinthe {
     private Case[][] carte;
     private Case entree;
     private Case sortie;
-
+    private List<String> historique = new ArrayList<>();
+    /**
+     * Constructeur de la classe Labyrinthe.
+     *
+     * @param n    Le nom du labyrinthe.
+     * @param lo   La longueur du labyrinthe.
+     * @param la   La largeur du labyrinthe.
+     * @param seed La valeur de la graine pour le générateur aléatoire.
+     */
     public Labyrinthe(String n, int lo, int la, long seed) {
         this.nom = n;
         this.largeur = la;
@@ -56,7 +64,13 @@ public class Labyrinthe {
 
         return voisins;
     }
-
+    /**
+     * retourne l'historique des actions effectuées sur le labyrinthe
+     * @return l'historique
+     */
+    public List<String> getHistorique() {
+        return historique;
+    }
     /**
      * Supprime le mur entre deux cases voisines.
      *
@@ -367,8 +381,15 @@ public class Labyrinthe {
      */
     public Case getSortie() { return sortie; }
 
+    /**
+     * Modifie le labyrinthe en ajoutant ou supprimant un mur dans une direction donnée.
+     *
+     * @param c         La case à modifier.
+     * @param direction La direction dans laquelle modifier le mur (nord, sud, est, ouest).
+     */
     public void modifierLabyrinthe(Case c, String direction) {
         direction = direction.trim().toLowerCase();
+        String avant = etatMur(c, direction);
         switch (direction) {
             case "nord":
                 c.murNord = !c.murNord;
@@ -396,10 +417,32 @@ public class Labyrinthe {
                 break;
             default:
                 // Ne rien faire si la direction n'est pas reconnue
-                break;
+                return;
         }
+        String apres = etatMur(c, direction);
+        historique.add("Case (" + c.getX() + "," + c.getY() + ") : mur " + direction.toUpperCase() + " passe de " + avant + " à " + apres);
     }
 
+    
+    /**
+     * Retourne l'état d'un mur dans une direction donnée.
+     *
+     * @param c         La case à vérifier.
+     * @param direction La direction du mur (nord, sud, est, ouest).
+     * @return L'état du mur (ouvert ou fermé).
+     */
+    private String etatMur(Case c, String direction) {
+        switch (direction) {
+            case "nord": return c.murNord ? "fermé" : "ouvert";
+            case "sud": return c.murSud ? "fermé" : "ouvert";
+            case "est": return c.murEst ? "fermé" : "ouvert";
+            case "ouest": return c.murOuest ? "fermé" : "ouvert";
+            default: return "?";
+        }
+    }
+    /**
+     * Réinitialise le labyrinthe en remettant toutes les cases à leur état initial.
+     */
     public void reset(){
         int longueur = this.getLongueur();
         int largeur  = this.getLargeur();
@@ -416,4 +459,49 @@ public class Labyrinthe {
         this.getEntree().setCouleur(Color.GREEN);
     }
     
+    public void genererImparfaitPasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
+        // Génération du labyrinthe parfait pas à pas
+        this.genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
+            // Une fois la génération parfaite terminée, on ajoute des ouvertures aléatoires pas à pas
+            ajouterOuverturesImparfaitesPasAPas(gridPane, infoLabel, onFinish, vitesse, cancelRequested);
+        }, vitesse, cancelRequested);
+    }
+
+
+    // Ajoute des ouvertures pour rendre le labyrinthe imparfait, pas à pas
+    private void ajouterOuverturesImparfaitesPasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
+        int nbOuvertures = Math.max(1, (this.largeur * this.longueur) * 5 / 100);
+        int[] compteur = {0};
+        Random rand = this.random;
+
+        Runnable step = new Runnable() {
+            @Override
+            public void run() {
+                if (cancelRequested[0] || compteur[0] >= nbOuvertures) {
+                    if (onFinish != null) onFinish.run();
+                    return;
+                }
+                int x = rand.nextInt(largeur);
+                int y = rand.nextInt(longueur);
+                int d = rand.nextInt(4);
+                if (isInBounds(x, y)) {
+                    switch (d) {
+                        case 0: modifierLabyrinthe(carte[x][y], "nord"); break;
+                        case 1: modifierLabyrinthe(carte[x][y], "sud"); break;
+                        case 2: modifierLabyrinthe(carte[x][y], "est"); break;
+                        case 3: modifierLabyrinthe(carte[x][y], "ouest"); break;
+                    }
+                }
+                compteur[0]++;
+                AfficheurLabyrinthe.afficherLabyrinthe(gridPane, Labyrinthe.this);
+                if (infoLabel != null) {
+                    infoLabel.setText("Ajout d'ouvertures imparfaites : " + compteur[0] + "/" + nbOuvertures);
+                }
+                PauseTransition pause = new PauseTransition(Duration.millis(vitesse));
+                pause.setOnFinished(e -> run());
+                pause.play();
+            }
+        };
+        step.run();
+    }
 }
