@@ -183,11 +183,11 @@ public class App extends Application {
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
                 historiqueArea.clear();
-                if (labyrintheHolder[0] != null) {
+                /* if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
                     }
-                }
+                }*/
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
@@ -227,11 +227,11 @@ public class App extends Application {
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
                 historiqueArea.clear();
-                if (labyrintheHolder[0] != null) {
+                /* if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
                     }
-                }
+                }*/
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
@@ -271,11 +271,6 @@ public class App extends Application {
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
                 historiqueArea.clear();
-                if (labyrintheHolder[0] != null) {
-                    for (String ligne : labyrintheHolder[0].getHistorique()) {
-                        historiqueArea.appendText(ligne + "\n");
-                    }
-                }
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
@@ -364,6 +359,8 @@ public class App extends Application {
             buttonGenererImparfait.setVisible(true);
             buttonGenererPasAPas.setVisible(true);
             algoButtonsBox.setVisible(false);
+            historiqueArea.setVisible(false);
+            
         });
 
         final Case[] selectedCase = new Case[1];
@@ -393,6 +390,11 @@ public class App extends Application {
                 // Mets la case sélectionnée en rouge
                 selectedCase[0].setCouleur(Color.RED);
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
+                if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
+                    gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                }
                 directionField.setVisible(true);
                 directionLabel.setVisible(true);
                 directionField.clear();
