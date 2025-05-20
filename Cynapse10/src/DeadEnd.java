@@ -116,9 +116,11 @@ public class DeadEnd extends Algorithme {
 
         while (!stack.isEmpty()) {
             Case current = stack.pop();
-            casesParcourues[0]++;
             int x = current.getX();
             int y = current.getY();
+           
+            casesParcourues[0]++;
+            
           
 
            // Obtenir les voisins disponibles
@@ -145,12 +147,15 @@ public class DeadEnd extends Algorithme {
                 voisins++;
             }
             if(voisins==1){ //si la case n'est pas une intersection
-                current.setParcourue(true);                    
+                current.setParcourue(true);      
+                passages[x][y]++;             
                 current.setCouleur(Color.YELLOW);
                 if(!voisinsDisponibles.isEmpty()){
                     Case next = voisinsDisponibles.get(0);
-                    stack.push(next);
-                    passages[x][y]++;
+                    if (!next.estParcourue()) {  
+                        stack.push(next);
+                    
+                    }
                 }
             }
             if (voisins<=1 && (current == sortie || current == entree)) { //si l'entrée ou la sortie mène à un cul de sac
@@ -187,11 +192,14 @@ public class DeadEnd extends Algorithme {
         if (stack.isEmpty()) {
             long endTime = System.nanoTime();
             int cheminFinal = afficherChemin(labyrinthe, sortie, gridPane);
-            infoLabel.setText("Exploration terminée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues + "\nNombre de cases du chemin final : " + cheminFinal);
+            infoLabel.setText("Exploration terminée !\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] + "\nNombre de cases du chemin final : " + cheminFinal);
             return;
         }
 
         Case current = stack.pop();
+        int x = current.getX();
+        int y = current.getY();
+        casesParcourues[0]++;
         Case entree = labyrinthe.getEntree();
         if (cancelRequested[0]) {
             // Arrête la génération/résolution
@@ -203,7 +211,7 @@ public class DeadEnd extends Algorithme {
         current.setCouleur(Color.RED);
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
         current.setCouleur(Color.WHITE);
-        casesParcourues[0]++;
+        
         // Affichage en direct
         long now = System.nanoTime();
         infoLabel.setText("En cours...\nTemps d'exécution : " + ((now - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0]);
@@ -211,8 +219,7 @@ public class DeadEnd extends Algorithme {
         // Obtenir les voisins disponibles
         int voisins = 0;
         List<Case> voisinsDisponibles = new ArrayList<>();
-        int x = current.getX();
-        int y = current.getY();
+
         // Récupérer les cases non visitées
         if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && passages[x - 1][y] == 0) {
             voisinsDisponibles.add(carte[x - 1][y]);
@@ -234,18 +241,21 @@ public class DeadEnd extends Algorithme {
             voisins++;
         }
         if(voisins==1){ //si la case n'est pas une intersection
-            current.setParcourue(true);                    
+            current.setParcourue(true);    
+            passages[x][y]++;                
             current.setCouleur(Color.YELLOW);
             if(!voisinsDisponibles.isEmpty()){
                 Case next = voisinsDisponibles.get(0);
-                stack.push(next);
-                passages[x][y]++;
+                if (!next.estParcourue()) {  
+                    stack.push(next);
+
+                }
             }
         }
         if (voisins<=1 && (current == sortie || current == entree)) {//si l'entrée ou la sortie mène à un cul de sac
             long endTime = System.nanoTime();
 
-            infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues );
+            infoLabel.setText("Pas de passage trouvé.\nTemps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s\nNombre de cases parcourues : " + casesParcourues[0] );
 
             AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
             return;
@@ -281,33 +291,15 @@ public class DeadEnd extends Algorithme {
         int longueur = labyrinthe.getLongueur();
         Case[][] carte = labyrinthe.getCarte();
         // Reconstruire le chemin de l'entrée vers la sortie
-        while (current != null && current != sortie) {
-        	casesParcourues++;
-            chemin.add(current);
-            System.out.println("Case: (" + current.getX() + ", " + current.getY() + ")");
-            // Obtenir les voisins disponibles
-            List<Case> voisinsDisponibles = new ArrayList<>();
-            int x = current.getX();
-            int y = current.getY();
-            // Récupérer les cases non visitées
-            if (!current.murNord && isInBounds(x - 1, y, largeur, longueur) && !carte[x-1][y].estParcourue()) {
-                voisinsDisponibles.add(carte[x - 1][y]);
+         for (int i=0; i<largeur;i++){
+            for (int j=0;j<longueur;j++){
+                current = carte[i][j];
+                if(!current.estParcourue()){
+                    chemin.add(current);
+                    casesParcourues++;
+                }
             }
-            if (!current.murSud && isInBounds(x + 1, y, largeur, longueur) && !carte[x+1][y].estParcourue()) {
-                    voisinsDisponibles.add(carte[x + 1][y]);
-            }
-            if (!current.murOuest && isInBounds(x, y - 1, largeur, longueur) && !carte[x][y-1].estParcourue()) {
-                    voisinsDisponibles.add(carte[x][y - 1]);
-            }
-            if (!current.murEst && isInBounds(x, y + 1, largeur, longueur) && !carte[x][y+1].estParcourue()) {
-                voisinsDisponibles.add(carte[x][y + 1]);
-            }
-            if (!voisinsDisponibles.isEmpty()) {
-                current.setParcourue(true);                    
-                current.setCouleur(Color.YELLOW);
-                current = voisinsDisponibles.get(0);
-            }
-        } 
+        }
         // Ajouter la sortie au chemin si elle a été trouvée
         if (current == sortie) {
             chemin.add(sortie);
