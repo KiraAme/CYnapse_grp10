@@ -292,15 +292,23 @@ public class Labyrinthe {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        for (int x = 0; x < this.largeur; x++) {
-            // Ligne des murs nord
-            for (int y = 0; y < this.longueur; y++) {
-                sb.append("+");
-                sb.append(this.carte[x][y].murNord ? "---" : "   ");
-            }
-            sb.append("+\n");
+        // Ligne des indices y (colonnes)
+        sb.append("    ");
+        for (int y = 0; y < this.longueur; y++) {
+            sb.append(String.format("%-3d", y));
+        }
+        sb.append("\n");
 
-            // Ligne des cases
+        // Ligne des murs nord
+        sb.append("   ");
+        for (int y = 0; y < this.longueur; y++) {
+            sb.append("+---");
+        }
+        sb.append("+\n");
+
+        for (int x = 0; x < this.largeur; x++) {
+            // Ligne des cases avec indice x à gauche
+            sb.append(String.format("%-3d", x));
             for (int y = 0; y < this.longueur; y++) {
                 sb.append(this.carte[x][y].murOuest ? "| " : "  ");
                 if (this.carte[x][y].estEntree) {
@@ -308,21 +316,23 @@ public class Labyrinthe {
                 } else if (this.carte[x][y].estSortie) {
                     sb.append("S ");
                 } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.YELLOW)) {
-                    sb.append("* "); // Chemin final
+                    sb.append("* ");
                 } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.RED)) {
-                    sb.append(". "); // Cases parcourues mais pas sur le chemin final
+                    sb.append(". ");
                 } else {
                     sb.append("  ");
                 }
             }
             sb.append("|\n");
-        }
 
-        // Dernière ligne de murs sud
-        for (int y = 0; y < this.longueur; y++) {
-            sb.append("+---");
+            // Ligne des murs sud
+            sb.append("   ");
+            for (int y = 0; y < this.longueur; y++) {
+                sb.append("+");
+                sb.append(this.carte[x][y].murSud ? "---" : "   ");
+            }
+            sb.append("+\n");
         }
-        sb.append("+\n");
 
         return sb.toString();
     }
