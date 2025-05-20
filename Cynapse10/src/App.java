@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -102,8 +103,8 @@ public class App extends Application {
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
 
-                if (longueur > 30) longueur = 30;
-                if (largeur > 30) largeur = 30;
+                if (longueur > 20) longueur = 20;
+                if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
                 if (largeur < 1) largeur = 1;
 
@@ -151,8 +152,8 @@ public class App extends Application {
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
 
-                if (longueur > 30) longueur = 30;
-                if (largeur > 30) largeur = 30;
+                if (longueur > 20) longueur = 20;
+                if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
                 if (largeur < 1) largeur = 1;
 
@@ -200,8 +201,8 @@ public class App extends Application {
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
 
-                if (longueur > 30) longueur = 30;
-                if (largeur > 30) largeur = 30;
+                if (longueur > 20) longueur = 20;
+                if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
                 if (largeur < 1) largeur = 1;
 
@@ -244,8 +245,8 @@ public class App extends Application {
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
 
-                if (longueur > 30) longueur = 30;
-                if (largeur > 30) largeur = 30;
+                if (longueur > 20) longueur = 20;
+                if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
                 if (largeur < 1) largeur = 1;
 
@@ -277,73 +278,80 @@ public class App extends Application {
         });
 
         // Champ pour la direction à modifier
-        TextField directionField = new TextField();
-        directionField.setPromptText("Nord, Sud, Est ou Ouest");
-        directionField.setVisible(false);
+        ComboBox<String> directionCombo = new ComboBox<>();
+        directionCombo.getItems().addAll("nord", "sud", "est", "ouest");
+        directionCombo.setPromptText("Choisir une direction");
+        directionCombo.setVisible(false);
         Label directionLabel = new Label("Entrez la direction à modifier :");
         directionLabel.setVisible(false);
 
         // Action du bouton "Trémaux"
         buttonTremauxdirect.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
+            labyrintheHolder[0].reset();
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.Trémaux, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);
-            directionField.setVisible(false);
+            directionCombo.setVisible(false);
             directionLabel.setVisible(false);
         });
 
         // Action du bouton "Trémaux pas à pas"
         buttonTremauxPasAPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
+            labyrintheHolder[0].reset();
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudrePasAPas(Algo.Trémaux, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);
-            directionField.setVisible(false);
+            directionCombo.setVisible(false);
             directionLabel.setVisible(false);
         });
         buttonDeadEndPasaPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
+            labyrintheHolder[0].reset();
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudrePasAPas(Algo.Deadend, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);
-            directionField.setVisible(false);
+            directionCombo.setVisible(false);
             directionLabel.setVisible(false);
         });
         buttonDeadEnddirect.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
+            labyrintheHolder[0].reset();
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.Deadend, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);
-            directionField.setVisible(false);
+            directionCombo.setVisible(false);
             directionLabel.setVisible(false);
         });
         buttonDijkstraPasAPas.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
+            labyrintheHolder[0].reset();
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudrePasAPas(Algo.ShortestPath, gridPane, infoLabel, cancelRequested);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);
-            directionField.setVisible(false);
+            directionCombo.setVisible(false);
             directionLabel.setVisible(false);
         });
         buttonDijkstradirect.setOnMouseClicked(event -> {
             modificationAutorisee[0] = false;
+            labyrintheHolder[0].reset();
             if (labyrintheHolder[0] != null) {
                 labyrintheHolder[0].résoudredirect(Algo.ShortestPath, gridPane, infoLabel);
             }
             algoButtonsBox.setVisible(false);
             buttonRetour.setVisible(true);
-            directionField.setVisible(false);
+            directionCombo.setVisible(false);
             directionLabel.setVisible(false);
         });
 
@@ -395,19 +403,19 @@ public class App extends Application {
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                 }
-                directionField.setVisible(true);
+                directionCombo.setVisible(true);
                 directionLabel.setVisible(true);
-                directionField.clear();
-                directionField.requestFocus();
+                directionCombo.getSelectionModel().clearSelection();
+                directionCombo.requestFocus();
             }
         });
 
         // Quand l'utilisateur entre une direction et appuie sur Entrée
-        directionField.setOnAction(e -> {
-            String dir = directionField.getText().trim().toLowerCase();
-            if (selectedCase[0] != null && (dir.equals("nord") || dir.equals("sud") || dir.equals("est") || dir.equals("ouest"))) {
+        directionCombo.setOnAction(e -> {
+            String dir = directionCombo.getValue();
+            if (selectedCase[0] != null && dir != null &&
+                (dir.equals("nord") || dir.equals("sud") || dir.equals("est") || dir.equals("ouest"))) {
                 labyrintheHolder[0].modifierLabyrinthe(selectedCase[0], dir);
-                // Remet la case en blanche après modification
                 selectedCase[0].setCouleur(Color.WHITE);
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
@@ -415,7 +423,7 @@ public class App extends Application {
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                 }
-                directionField.setVisible(false);
+                directionCombo.setVisible(false);
                 directionLabel.setVisible(false);
                 // Réinitialise la sélection
                 selectedCase[0] = null;
@@ -428,15 +436,14 @@ public class App extends Application {
                     }
                 }
             } else {
-                directionField.setText("");
-                directionField.setPromptText("Nord, Sud, Est ou Ouest");
+                directionCombo.setPromptText("Nord, Sud, Est ou Ouest");
             }
         });
 
         HBox labyBox = new HBox(gridPane, saisieBox);
         labyBox.setSpacing(30);
         labyBox.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(directionLabel, directionField, labyBox, infoLabel,historiqueArea, buttonRetour);
+        root.getChildren().addAll(directionLabel, directionCombo, labyBox, infoLabel,historiqueArea, buttonRetour);
 
         primaryStage.setScene(scene);
         primaryStage.show();
