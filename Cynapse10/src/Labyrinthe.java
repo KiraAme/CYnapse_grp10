@@ -201,6 +201,33 @@ public class Labyrinthe {
         pause.play();
     }
     
+
+    public void genererImparfait(){
+        this.genererLabyrinthe();
+        for(int i=0; i<=((this.largeur*this.longueur)*5/100) ;i++){
+            int x= random.nextInt(this.largeur);
+            int y=random.nextInt(this.longueur);
+            int d = random.nextInt(4);
+            if(isInBounds(x, y)){
+                switch (d) {
+                    case 0:
+                        this.modifierLabyrinthe(this.carte[x][y], "nord");
+                        break;
+                    case 1:
+                        this.modifierLabyrinthe(this.carte[x][y], "sud");
+                        break;
+                    case 2:
+                        this.modifierLabyrinthe(this.carte[x][y], "est");
+                        break;
+                    case 3:
+                        this.modifierLabyrinthe(this.carte[x][y], "ouest");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
     /**
      * Résout le labyrinthe en utilisant l'algorithme spécifié.
      *
@@ -221,6 +248,7 @@ public class Labyrinthe {
             case ShortestPath:
                 algorithme = new Dijkstra();
                 break;
+            
             default:
                 System.out.println("Algorithme non reconnu.");
                 return;
