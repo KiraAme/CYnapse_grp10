@@ -219,25 +219,32 @@ public class Labyrinthe {
     public void genererImparfait(){
         this.genererLabyrinthe();
         for(int i=0; i<=((this.largeur*this.longueur)*5/100) ;i++){
-            int x= random.nextInt(this.largeur);
-            int y=random.nextInt(this.longueur);
+            // ...
+            int x = random.nextInt(largeur);
+            int y = random.nextInt(longueur);
             int d = random.nextInt(4);
-            if(isInBounds(x, y) && x!=0 && y!=0 && x!=this.largeur-1 && y!=this.longueur-1){
+            // je ne veux pas que l'on modifie les murs extérieurs
+            boolean peutModifier = true;
+            switch (d) {
+                case 0: // nord
+                    if (x == 0) peutModifier = false;
+                    break;
+                case 1: // sud
+                    if (x == largeur - 1) peutModifier = false;
+                    break;
+                case 2: // est
+                    if (y == longueur - 1) peutModifier = false;
+                    break;
+                case 3: // ouest
+                    if (y == 0) peutModifier = false;
+                    break;
+            }
+            if (isInBounds(x, y) && peutModifier) {
                 switch (d) {
-                    case 0:
-                        this.modifierLabyrinthe(this.carte[x][y], "nord");
-                        break;
-                    case 1:
-                        this.modifierLabyrinthe(this.carte[x][y], "sud");
-                        break;
-                    case 2:
-                        this.modifierLabyrinthe(this.carte[x][y], "est");
-                        break;
-                    case 3:
-                        this.modifierLabyrinthe(this.carte[x][y], "ouest");
-                        break;
-                    default:
-                        break;
+                    case 0: modifierLabyrinthe(carte[x][y], "nord"); break;
+                    case 1: modifierLabyrinthe(carte[x][y], "sud"); break;
+                    case 2: modifierLabyrinthe(carte[x][y], "est"); break;
+                    case 3: modifierLabyrinthe(carte[x][y], "ouest"); break;
                 }
             }
         }
@@ -477,7 +484,7 @@ public class Labyrinthe {
     private void ajouterOuverturesImparfaitesPasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
         int nbOuvertures = Math.max(1, (this.largeur * this.longueur) * 5 / 100);
         int[] compteur = {0};
-        Random rand = this.random;
+        
 
         Runnable step = new Runnable() {
             @Override
@@ -486,10 +493,26 @@ public class Labyrinthe {
                     if (onFinish != null) onFinish.run();
                     return;
                 }
-                int x = rand.nextInt(largeur);
-                int y = rand.nextInt(longueur);
-                int d = rand.nextInt(4);
-                if (isInBounds(x, y) && x != 0 && y != 0 && x != largeur - 1 && y != longueur - 1) {
+                int x = random.nextInt(largeur);
+                int y = random.nextInt(longueur);
+                int d = random.nextInt(4);
+                // je ne veux pas que l'on modifie les murs extérieurs
+                boolean peutModifier = true;
+                switch (d) {
+                    case 0: // nord
+                        if (x == 0) peutModifier = false;
+                        break;
+                    case 1: // sud
+                        if (x == largeur - 1) peutModifier = false;
+                        break;
+                    case 2: // est
+                        if (y == longueur - 1) peutModifier = false;
+                        break;
+                    case 3: // ouest
+                        if (y == 0) peutModifier = false;
+                        break;
+                }
+                if (isInBounds(x, y) && peutModifier) {
                     switch (d) {
                         case 0: modifierLabyrinthe(carte[x][y], "nord"); break;
                         case 1: modifierLabyrinthe(carte[x][y], "sud"); break;
