@@ -12,6 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import java.io.*;
+import javafx.scene.layout.Region;
 
 public class App extends Application {
 
@@ -25,7 +27,9 @@ public class App extends Application {
 
         Labyrinthe[] labyrintheHolder = new Labyrinthe[1];
         final boolean[] modificationAutorisee = {true};
-
+        Button buttonSauvegarder = new Button("Sauvegarder");
+        Button buttonRestaurer = new Button("Restaurer");
+        buttonSauvegarder.setVisible(false);
         // Champs de saisie utilisateur
         TextField longueurField = new TextField("20");
         longueurField.setPromptText("Longueur");
@@ -60,8 +64,7 @@ public class App extends Application {
         historiqueArea.setPromptText("Historique des modifications...");
         historiqueArea.setVisible(false);
 
-        Button buttonRetour = new Button("Retour");
-        buttonRetour.setVisible(false);
+        
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(0);
@@ -72,7 +75,7 @@ public class App extends Application {
         infoLabel.setMaxWidth(Double.MAX_VALUE);
         infoLabel.setMinHeight(100);
         VBox.setVgrow(infoLabel, javafx.scene.layout.Priority.ALWAYS);
-
+        
         ScrollPane scrollPane = new ScrollPane(gridPane);
         scrollPane.setPannable(true);
 
@@ -84,18 +87,28 @@ public class App extends Application {
             buttonGenerer,
             buttonGenererImparfait,
             buttonGenererPasAPas,
-            buttonGenererImparfaitPasAPas
+            buttonGenererImparfaitPasAPas,
+            buttonRestaurer
         );
         saisieFieldsBox.setAlignment(Pos.CENTER_LEFT);
-
+        
         VBox algoButtonsBox = new VBox(7, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect, buttonDeadEndPasaPas, buttonDijkstradirect, buttonDijkstraPasAPas);
         algoButtonsBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox saisieBox = new VBox(5, 
-            saisieFieldsBox, algoButtonsBox
+            saisieFieldsBox, algoButtonsBox,buttonSauvegarder
         );
         saisieBox.setAlignment(Pos.CENTER_LEFT);
-
+        // Champ pour la direction à modifier
+        ComboBox<String> directionCombo = new ComboBox<>();
+        directionCombo.getItems().addAll("nord", "sud", "est", "ouest");
+        Label directionLabel = new Label("Entrez la direction à modifier :");
+        directionCombo.setPromptText("Choisir une direction");
+        directionCombo.setVisible(false);
+        
+        directionLabel.setVisible(false);
+        Button buttonRetour = new Button("Retour");
+        buttonRetour.setVisible(false);
         // Action du bouton "Générer"
         buttonGenerer.setOnMouseClicked(event -> {
             try {
@@ -113,13 +126,113 @@ public class App extends Application {
 
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
-
+                gridPane.getChildren().clear();
+                gridPane.getColumnConstraints().clear();
+                gridPane.getRowConstraints().clear();
                 labyrintheHolder[0].genererLabyrinthe();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                }
+                else {
+                    gridPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
+                buttonTremauxdirect.setVisible(true);
+                buttonTremauxPasAPas.setVisible(true);
+                buttonDeadEndPasaPas.setVisible(true);
+                buttonDeadEnddirect.setVisible(true);
+                buttonDijkstraPasAPas.setVisible(true);
+                buttonDijkstradirect.setVisible(true);
+                algoButtonsBox.setVisible(true);
+                modificationAutorisee[0] = true;
+                buttonRetour.setVisible(true);
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
+                buttonGenerer.setVisible(false);
+                buttonGenererImparfait.setVisible(false);
+                saisieFieldsBox.setVisible(false);
+                historiqueArea.setVisible(true);
+                directionCombo.setVisible(false);
+                directionLabel.setVisible(false);
+                
+               
+                /* if (labyrintheHolder[0] != null) {
+                    for (String ligne : labyrintheHolder[0].getHistorique()) {
+                        historiqueArea.appendText(ligne + "\n");
+                    }
+                }*/
+            } catch (NumberFormatException e) {
+                infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
+            }
+        });
+        buttonSauvegarder.setOnMouseClicked(event -> {
+            if (labyrintheHolder[0] == null) return;
+                try (PrintWriter writer = new PrintWriter(new FileWriter("labyrinthe_save.txt"))) {
+                    writer.println(labyrintheHolder[0].getLongueur());
+                    writer.println(labyrintheHolder[0].getLargeur());
+                    writer.println(labyrintheHolder[0].getSeed());
+                    for (String ligne : labyrintheHolder[0].getHistorique()) {
+                        writer.println(ligne);
+                    }
+                    infoLabel.setText("Labyrinthe sauvegardé !");
+                } catch (IOException e) {
+                    infoLabel.setText("Erreur lors de la sauvegarde.");
+                }
+            });
+        buttonRestaurer.setOnMouseClicked(event -> {
+            try (BufferedReader reader = new BufferedReader(new FileReader("labyrinthe_save.txt"))) {
+                int longueur = Integer.parseInt(reader.readLine());
+                int largeur = Integer.parseInt(reader.readLine());
+                long seed = Long.parseLong(reader.readLine());
+                gridPane.getChildren().clear();
+                gridPane.getColumnConstraints().clear();
+                gridPane.getRowConstraints().clear();
+                Labyrinthe lab = new Labyrinthe("Restauré", longueur, largeur, seed);
+                lab.genererLabyrinthe();
+
+                String ligne;
+                while ((ligne = reader.readLine()) != null) {
+                    if (ligne.startsWith("Case")) {
+                        try {
+                            // Extrait les coordonnées
+                            String[] parts = ligne.split("[(),:]");
+                            int x = Integer.parseInt(parts[1].trim());
+                            int y = Integer.parseInt(parts[2].trim());
+                            // Extrait la direction (toujours après "mur ")
+                            String[] murParts = ligne.split("mur ");
+                            String direction = murParts[1].split(" ")[0].trim().toLowerCase();
+                            // Normalise la direction (enlève accents, majuscules)
+                            direction = direction.replaceAll("[éèêë]", "e");
+                            direction = direction.replaceAll("[àâä]", "a");
+                            direction = direction.replaceAll("[ûùü]", "u");
+                            direction = direction.replaceAll("[ôö]", "o");
+                            direction = direction.replaceAll("[îï]", "i");
+                            // Vérifie que la direction est valide
+                            if (direction.equals("nord") || direction.equals("sud") || direction.equals("est") || direction.equals("ouest")) {
+                                lab.modifierLabyrinthe(lab.getCarte()[x][y], direction);
+                            }
+                        } catch (Exception ex) {
+                            // Ignore la ligne si erreur de parsing
+                        }
+                    }
+                }
+                labyrintheHolder[0] = lab;
+                AfficheurLabyrinthe.afficherLabyrinthe(gridPane, lab);
+                if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
+                    gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                }
+                else {
+                    gridPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
@@ -129,19 +242,23 @@ public class App extends Application {
                 buttonDijkstradirect.setVisible(true);
                 algoButtonsBox.setVisible(true);
                 modificationAutorisee[0] = true;
-
+                buttonRetour.setVisible(true);
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
                 buttonGenerer.setVisible(false);
                 buttonGenererImparfait.setVisible(false);
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
-                historiqueArea.clear();
+                directionCombo.setVisible(false);
+                directionLabel.setVisible(false);
+                
                 if (labyrintheHolder[0] != null) {
-                    for (String ligne : labyrintheHolder[0].getHistorique()) {
-                        historiqueArea.appendText(ligne + "\n");
+                    for (String li : labyrintheHolder[0].getHistorique()) {
+                        historiqueArea.appendText(li + "\n");
                     }
                 }
-            } catch (NumberFormatException e) {
-                infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
+            } catch (Exception e) {
+                infoLabel.setText("Erreur lors de la restauration.");
             }
         });
 
@@ -162,7 +279,9 @@ public class App extends Application {
 
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
-
+                gridPane.getChildren().clear();
+                gridPane.getColumnConstraints().clear();
+                gridPane.getRowConstraints().clear();
                 labyrintheHolder[0].genererImparfait();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
@@ -170,6 +289,13 @@ public class App extends Application {
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                 }
+                else {
+                    gridPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
                 buttonDeadEndPasaPas.setVisible(true);
@@ -178,18 +304,23 @@ public class App extends Application {
                 buttonDijkstradirect.setVisible(true);
                 algoButtonsBox.setVisible(true);
                 modificationAutorisee[0] = true;
-
+                buttonRetour.setVisible(true);
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
                 buttonGenerer.setVisible(false);
                 buttonGenererImparfait.setVisible(false);
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
-                labyrintheHolder[0].resetHistorique();
+                directionCombo.setVisible(false);
+                directionLabel.setVisible(false);
+                
                
-                /* if (labyrintheHolder[0] != null) {
+                if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
                     }
-                }*/
+                    historiqueArea.appendText("Labyrinthe Imparfait généré avec succès !\n");
+                }
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
@@ -209,7 +340,9 @@ public class App extends Application {
 
                 longueurField.setText(String.valueOf(longueur));
                 largeurField.setText(String.valueOf(largeur));
-
+                gridPane.getChildren().clear();
+                gridPane.getColumnConstraints().clear();
+                gridPane.getRowConstraints().clear();
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
                 labyrintheHolder[0].genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
@@ -222,6 +355,16 @@ public class App extends Application {
                     algoButtonsBox.setVisible(true);
                     modificationAutorisee[0] = true;
                 }, Integer.parseInt(vitesse.getText()), cancelRequested);
+                if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
+                    gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                }
+                else {
+                    gridPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
                 buttonGenerer.setVisible(false);
                 buttonGenererImparfait.setVisible(false);
                 buttonRetour.setVisible(true);
@@ -229,11 +372,15 @@ public class App extends Application {
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
                 historiqueArea.clear();
-                /* if (labyrintheHolder[0] != null) {
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
+                directionCombo.setVisible(false);
+                directionLabel.setVisible(false);
+                 if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
                     }
-                }*/
+                }
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
@@ -250,7 +397,9 @@ public class App extends Application {
                 if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
                 if (largeur < 1) largeur = 1;
-
+                gridPane.getChildren().clear();
+                gridPane.getColumnConstraints().clear();
+                gridPane.getRowConstraints().clear();
                 longueurField.setText(String.valueOf(longueur));
                 largeurField.setText(String.valueOf(largeur));
 
@@ -267,25 +416,30 @@ public class App extends Application {
                     algoButtonsBox.setVisible(true);
                     modificationAutorisee[0] = true;
                 }, Integer.parseInt(vitesse.getText()), cancelRequested);
-
+                if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
+                    gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                    gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                }else {
+                    gridPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
                 
                 buttonRetour.setVisible(true);
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
-                labyrintheHolder[0].resetHistorique();
-                historiqueArea.clear();
+                buttonSauvegarder.setVisible(true);
+                buttonRestaurer.setVisible(false);
+                directionCombo.setVisible(false);
+                directionLabel.setVisible(false);
+                
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
         });
 
-        // Champ pour la direction à modifier
-        ComboBox<String> directionCombo = new ComboBox<>();
-        directionCombo.getItems().addAll("nord", "sud", "est", "ouest");
-        directionCombo.setPromptText("Choisir une direction");
-        directionCombo.setVisible(false);
-        Label directionLabel = new Label("Entrez la direction à modifier :");
-        directionLabel.setVisible(false);
+        
 
         // Action du bouton "Trémaux"
         buttonTremauxdirect.setOnMouseClicked(event -> {
@@ -370,6 +524,11 @@ public class App extends Application {
             buttonGenererPasAPas.setVisible(true);
             algoButtonsBox.setVisible(false);
             historiqueArea.setVisible(false);
+            buttonRestaurer.setVisible(true);
+            buttonSauvegarder.setVisible(false); 
+            directionCombo.setVisible(false);
+            directionLabel.setVisible(false);
+            historiqueArea.clear();   
             
         });
 

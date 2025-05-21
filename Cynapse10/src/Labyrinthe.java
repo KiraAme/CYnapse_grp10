@@ -18,6 +18,7 @@ public class Labyrinthe {
     private Case[][] carte;
     private Case entree;
     private Case sortie;
+    private long seed;
     private List<String> historique = new ArrayList<>();
     /**
      * Constructeur de la classe Labyrinthe.
@@ -32,6 +33,7 @@ public class Labyrinthe {
         this.largeur = la;
         this.longueur = lo;
         this.random = new Random(seed);
+        this.seed = seed;
         
     }
     
@@ -388,6 +390,8 @@ public class Labyrinthe {
      */
     public Case getSortie() { return sortie; }
 
+
+    public long getSeed() { return seed; }
     /**
      * Modifie le labyrinthe en ajoutant ou supprimant un mur dans une direction donnée.
      *
@@ -427,7 +431,7 @@ public class Labyrinthe {
                 return;
         }
         String apres = etatMur(c, direction);
-        historique.add("Case (" + c.getX() + "," + c.getY() + ") : mur " + direction.toUpperCase() + " passe de " + avant + " à " + apres);
+        historique.add("Case (" + c.getX() + "," + c.getY() + ") : mur " + direction.toUpperCase() + " passe de " + avant + " a " + apres);
     }
 
     
@@ -440,10 +444,10 @@ public class Labyrinthe {
      */
     private String etatMur(Case c, String direction) {
         switch (direction) {
-            case "nord": return c.murNord ? "fermé" : "ouvert";
-            case "sud": return c.murSud ? "fermé" : "ouvert";
-            case "est": return c.murEst ? "fermé" : "ouvert";
-            case "ouest": return c.murOuest ? "fermé" : "ouvert";
+            case "nord": return c.murNord ? "ferme" : "ouvert";
+            case "sud": return c.murSud ? "ferme" : "ouvert";
+            case "est": return c.murEst ? "ferme" : "ouvert";
+            case "ouest": return c.murOuest ? "ferme" : "ouvert";
             default: return "?";
         }
     }
