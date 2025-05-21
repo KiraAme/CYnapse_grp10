@@ -196,7 +196,7 @@ public class DeadEnd extends Algorithme {
                     "Nombre de cases parcourues : " + casesParcourues[0] + cheminFinal.size() + "\n" 
                 );
             } else {
-                System.out.println("Sortie trouvée !");
+                System.out.println("Pas de chemin trouvé.");
                 System.out.println("Temps d'exécution : " + ((endTime - startTime) / 1_000_000_000.0) + " s");
                 System.out.println("Nombre de cases parcourues : " + casesParcourues[0]+ cheminFinal.size());
             }
