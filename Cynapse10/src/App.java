@@ -183,7 +183,8 @@ public class App extends Application {
                 buttonGenererImparfait.setVisible(false);
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
-                historiqueArea.clear();
+                labyrintheHolder[0].resetHistorique();
+               
                 /* if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
@@ -271,6 +272,7 @@ public class App extends Application {
                 buttonRetour.setVisible(true);
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
+                labyrintheHolder[0].resetHistorique();
                 historiqueArea.clear();
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");

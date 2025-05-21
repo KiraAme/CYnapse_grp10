@@ -222,7 +222,7 @@ public class Labyrinthe {
             int x= random.nextInt(this.largeur);
             int y=random.nextInt(this.longueur);
             int d = random.nextInt(4);
-            if(isInBounds(x, y)){
+            if(isInBounds(x, y) && x!=0 && y!=0 && x!=this.largeur-1 && y!=this.longueur-1){
                 switch (d) {
                     case 0:
                         this.modifierLabyrinthe(this.carte[x][y], "nord");
@@ -458,7 +458,12 @@ public class Labyrinthe {
         this.getEntree().setDistance(0);
         this.getEntree().setCouleur(Color.GREEN);
     }
-    
+    /**
+     * Réinitialise l'historique des actions effectuées sur le labyrinthe.
+     */
+    public void resetHistorique() {
+        historique.clear();
+    }
     public void genererImparfaitPasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
         // Génération du labyrinthe parfait pas à pas
         this.genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
@@ -484,7 +489,7 @@ public class Labyrinthe {
                 int x = rand.nextInt(largeur);
                 int y = rand.nextInt(longueur);
                 int d = rand.nextInt(4);
-                if (isInBounds(x, y)) {
+                if (isInBounds(x, y) && x != 0 && y != 0 && x != largeur - 1 && y != longueur - 1) {
                     switch (d) {
                         case 0: modifierLabyrinthe(carte[x][y], "nord"); break;
                         case 1: modifierLabyrinthe(carte[x][y], "sud"); break;
