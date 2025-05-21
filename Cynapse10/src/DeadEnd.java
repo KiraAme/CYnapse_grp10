@@ -285,7 +285,7 @@ public class DeadEnd extends Algorithme {
     private int afficherChemin(Labyrinthe labyrinthe, Case sortie, GridPane gridPane) {
     	int casesParcourues =0;
         Case entree = labyrinthe.getEntree();
-        List<Case> chemin = new ArrayList<>();
+        ArrayList<Case> chemin = new ArrayList<>();
         Case current = entree;
         int largeur = labyrinthe.getLargeur();
         int longueur = labyrinthe.getLongueur();
@@ -300,10 +300,7 @@ public class DeadEnd extends Algorithme {
                 }
             }
         }
-        // Ajouter la sortie au chemin si elle a été trouvée
-        if (current == sortie) {
-            chemin.add(sortie);
-        }
+        chemin = trouverComposanteConnexe(sortie, chemin, labyrinthe);
         labyrinthe.reset();
         // Colorer uniquement le chemin trouvé
         for (Case c : chemin) {
@@ -321,6 +318,39 @@ public class DeadEnd extends Algorithme {
         return casesParcourues;
     }
 
-
+    private ArrayList<Case> trouverComposanteConnexe (Case sortie, ArrayList<Case> chemin, Labyrinthe labyrinthe){
+        ArrayList<Case> cheminConnexe = new ArrayList<Case>();
+        cheminConnexe.add(sortie);
+        cheminConnexe = dfs(sortie, chemin, cheminConnexe, labyrinthe);
+        return cheminConnexe;
+    }
     
+
+    private ArrayList<Case> dfs(Case c, ArrayList<Case> cases, ArrayList<Case> casesParcourues, Labyrinthe labyrinthe){
+        if(casesParcourues.contains(c)){
+            int x = c.getX();
+            int y = c.getY();
+            int largeur = labyrinthe.getLargeur();
+            int longueur = labyrinthe.getLongueur();
+            Case[][] carte = labyrinthe.getCarte();
+            if (!c.murNord && isInBounds(x - 1, y, largeur, longueur) && cases.contains(carte[x-1][y]) && !casesParcourues.contains(carte[x-1][y])) {
+                casesParcourues.add(carte[x-1][y]);
+                casesParcourues = dfs(carte[x-1][y], cases, casesParcourues, labyrinthe);
+            }
+            if (!c.murSud && isInBounds(x + 1, y, largeur, longueur) && cases.contains(carte[x+1][y]) && !casesParcourues.contains(carte[x+1][y])) {
+                casesParcourues.add(carte[x+1][y]);
+                casesParcourues = dfs(carte[x+1][y], cases, casesParcourues, labyrinthe);
+            }
+            if (!c.murOuest && isInBounds(x, y-1, largeur, longueur) && cases.contains(carte[x][y-1]) && !casesParcourues.contains(carte[x][y-1])) {
+                casesParcourues.add(carte[x][y-1]);
+                casesParcourues = dfs(carte[x][y-1], cases, casesParcourues, labyrinthe);
+            }
+            if (!c.murEst && isInBounds(x, y + 1, largeur, longueur) && cases.contains(carte[x][y + 1]) && !casesParcourues.contains(carte[x][y + 1])) {
+                casesParcourues.add(carte[x][y + 1]);
+                casesParcourues = dfs(carte[x][y + 1], cases, casesParcourues, labyrinthe);
+            }
+        }
+
+        return casesParcourues;
+    }
 }
