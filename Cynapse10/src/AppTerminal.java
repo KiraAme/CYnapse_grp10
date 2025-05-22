@@ -2,7 +2,13 @@ import java.util.Scanner;
 import java.io.*;
 
 public class AppTerminal {
+    /**
+     * Classe principale pour le générateur de labyrinthes en mode terminal.
+     * Permet de créer, modifier, sauvegarder et résoudre un labyrinthe.
+     */
     public static void main(String[] args) {
+        // Initialisation du générateur de labyrinthe
+        // Utilisation de Scanner pour la saisie utilisateur
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("=== Générateur de Labyrinthe (Terminal) ===");
@@ -19,7 +25,7 @@ public class AppTerminal {
             } else {
                 scanner.next(); // Consomme l'entrée invalide
             }
-            System.out.println("Veuillez entrer un entier entre 1 et 50.");
+            System.out.println("Veuillez entrer un entier entre 1 et 30.");
         }
 
         // Saisie sécurisée de la largeur

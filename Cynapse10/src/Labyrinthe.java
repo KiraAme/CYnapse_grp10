@@ -221,11 +221,11 @@ public class Labyrinthe {
     public void genererImparfait(){
         this.genererLabyrinthe();
         for(int i=0; i<=((this.largeur*this.longueur)*5/100) ;i++){
-            // ...
+           
             int x = random.nextInt(largeur);
             int y = random.nextInt(longueur);
             int d = random.nextInt(4);
-            // je ne veux pas que l'on modifie les murs extérieurs
+            
             boolean peutModifier = true;
             switch (d) {
                 case 0: // nord
@@ -401,37 +401,56 @@ public class Labyrinthe {
     public void modifierLabyrinthe(Case c, String direction) {
         direction = direction.trim().toLowerCase();
         String avant = etatMur(c, direction);
-        switch (direction) {
-            case "nord":
-                c.murNord = !c.murNord;
-                if (isInBounds(c.getX() - 1, c.getY())) {
-                    carte[c.getX() - 1][c.getY()].murSud = c.murNord;
+        //je ne veux pas que l'on modifie les murs extérieurs
+        
+        boolean peutModifier = true;
+                switch (direction) {
+                    case "nord": // nord
+                        if (c.getX() == 0) peutModifier = false;
+                        break;
+                    case "sud": // sud
+                        if (c.getX() == largeur - 1) peutModifier = false;
+                        break;
+                    case "est": // est
+                        if (c.getY() == longueur - 1) peutModifier = false;
+                        break;
+                    case "ouest": // ouest
+                        if (c.getY() == 0) peutModifier = false;
+                        break;
                 }
-                break;
-            case "sud":
-                c.murSud = !c.murSud;
-                if (isInBounds(c.getX() + 1, c.getY())) {
-                    carte[c.getX() + 1][c.getY()].murNord = c.murSud;
-                }
-                break;
-            case "est":
-                c.murEst = !c.murEst;
-                if (isInBounds(c.getX(), c.getY() + 1)) {
-                    carte[c.getX()][c.getY() + 1].murOuest = c.murEst;
-                }
-                break;
-            case "ouest":
-                c.murOuest = !c.murOuest;
-                if (isInBounds(c.getX(), c.getY() - 1)) {
-                    carte[c.getX()][c.getY() - 1].murEst = c.murOuest;
-                }
-                break;
-            default:
-                // Ne rien faire si la direction n'est pas reconnue
-                return;
+        if (peutModifier) {
+            switch (direction) {
+                case "nord":
+                    c.murNord = !c.murNord;
+                    if (isInBounds(c.getX() - 1, c.getY())) {
+                        carte[c.getX() - 1][c.getY()].murSud = c.murNord;
+                    }
+                    break;
+                case "sud":
+                    c.murSud = !c.murSud;
+                    if (isInBounds(c.getX() + 1, c.getY())  ) {
+                        carte[c.getX() + 1][c.getY()].murNord = c.murSud;
+                    }
+                    break;
+                case "est":
+                    c.murEst = !c.murEst;
+                    if (isInBounds(c.getX(), c.getY() + 1)) {
+                        carte[c.getX()][c.getY() + 1].murOuest = c.murEst;
+                    }
+                    break;
+                case "ouest":
+                    c.murOuest = !c.murOuest;
+                    if (isInBounds(c.getX(), c.getY() - 1)) {
+                        carte[c.getX()][c.getY() - 1].murEst = c.murOuest;
+                    }
+                    break;
+                default:
+                    // Ne rien faire si la direction n'est pas reconnue
+                    return;
+            }
+            String apres = etatMur(c, direction);
+            historique.add("Case (" + c.getX() + "," + c.getY() + ") : mur " + direction.toUpperCase() + " passe de " + avant + " a " + apres);
         }
-        String apres = etatMur(c, direction);
-        historique.add("Case (" + c.getX() + "," + c.getY() + ") : mur " + direction.toUpperCase() + " passe de " + avant + " a " + apres);
     }
 
     
@@ -490,8 +509,12 @@ public class Labyrinthe {
         int[] compteur = {0};
         
 
+        // step est une fonction qui sera appelée à chaque étape de l'animation
+        // Elle utilise une variable pour garder la trace du nombre d'ouvertures ajoutées
         Runnable step = new Runnable() {
             @Override
+            // Cette méthode sera appelée à chaque étape de l'animation
+
             public void run() {
                 if (cancelRequested[0] || compteur[0] >= nbOuvertures) {
                     if (onFinish != null) onFinish.run();

@@ -1,4 +1,7 @@
 5
 5
-1
-Case (0,0) : mur NORD passe de ferme a ouvert
+23143
+Case (0,0) : mur EST passe de ouvert a ferme
+Case (0,0) : mur EST passe de ferme a ouvert
+Case (4,1) : mur NORD passe de ferme a ouvert
+Case (3,1) : mur SUD passe de ouvert a ferme

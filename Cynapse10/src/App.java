@@ -15,21 +15,28 @@ import javafx.scene.control.TextArea;
 import java.io.*;
 import javafx.scene.layout.Region;
 
+/**
+ * Classe principale de l'application JavaFX.
+ * Cette classe gère l'interface utilisateur et les interactions avec l'utilisateur.
+ */
 public class App extends Application {
 
+    /**
+     * Méthode principale pour lancer l'application JavaFX.
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // Création de la fenêtre principale
         VBox root = new VBox();
         final int CELL_SIZE = 30;
         final boolean[] cancelRequested = {false};
         primaryStage.setTitle("Générateur de Labyrinthe");
         Scene scene = new Scene(root, 1000, 1000);
-
+        //creation d'un tableau de labyrinthe pour le stocker
         Labyrinthe[] labyrintheHolder = new Labyrinthe[1];
+        // tableau pour savoir si la modification est autorisée
         final boolean[] modificationAutorisee = {true};
-        Button buttonSauvegarder = new Button("Sauvegarder");
-        Button buttonRestaurer = new Button("Restaurer");
-        buttonSauvegarder.setVisible(false);
+        
         // Champs de saisie utilisateur
         TextField longueurField = new TextField("20");
         longueurField.setPromptText("Longueur");
@@ -39,7 +46,12 @@ public class App extends Application {
         seedField.setPromptText("Seed");
         TextField vitesse = new TextField("100");
         vitesse.setPromptText("Vitesse (ms)");
-
+        //creation des boutons
+        Button buttonSauvegarder = new Button("Sauvegarder");
+        Button buttonRestaurer = new Button("Restaurer");
+        buttonSauvegarder.setVisible(false);
+        Button buttonRetour = new Button("Retour");
+        buttonRetour.setVisible(false);
         Button buttonGenerer = new Button("Générer Labyrinthe");
         Button buttonGenererImparfait = new Button("Générer Labyrinthe Imparfait");
         Button buttonGenererPasAPas = new Button("Générer Labyrinthe pas à pas");
@@ -56,6 +68,7 @@ public class App extends Application {
         buttonTremauxPasAPas.setVisible(false);
         buttonDijkstraPasAPas.setVisible(false);
         buttonDijkstradirect.setVisible(false);
+        //creation de la zone de texte pour l'historique
         TextArea historiqueArea = new TextArea();
         historiqueArea.setEditable(false);
         historiqueArea.setPrefRowCount(8);
@@ -65,20 +78,20 @@ public class App extends Application {
         historiqueArea.setVisible(false);
 
         
-
+        // Création du GridPane pour afficher le labyrinthe
         GridPane gridPane = new GridPane();
         gridPane.setHgap(0);
         gridPane.setVgap(0);
         gridPane.setPadding(javafx.geometry.Insets.EMPTY);
+        // creation de la zone d'affichage des statistiques
         Label infoLabel = new Label("Statistiques :");
         infoLabel.setWrapText(true);
         infoLabel.setMaxWidth(Double.MAX_VALUE);
         infoLabel.setMinHeight(100);
         VBox.setVgrow(infoLabel, javafx.scene.layout.Priority.ALWAYS);
         
-        ScrollPane scrollPane = new ScrollPane(gridPane);
-        scrollPane.setPannable(true);
-
+        
+        // vbox pour les champs de saisie
         VBox saisieFieldsBox = new VBox(5,
             new Label("Longueur :"), longueurField,
             new Label("Largeur :"), largeurField,
@@ -91,31 +104,31 @@ public class App extends Application {
             buttonRestaurer
         );
         saisieFieldsBox.setAlignment(Pos.CENTER_LEFT);
-        
+        // vbox pour les boutons d'algorithmes
         VBox algoButtonsBox = new VBox(7, buttonTremauxdirect, buttonTremauxPasAPas, buttonDeadEnddirect, buttonDeadEndPasaPas, buttonDijkstradirect, buttonDijkstraPasAPas);
         algoButtonsBox.setAlignment(Pos.CENTER_LEFT);
-
+        //vbox pour les boutons 
         VBox saisieBox = new VBox(5, 
             saisieFieldsBox, algoButtonsBox,buttonSauvegarder
         );
         saisieBox.setAlignment(Pos.CENTER_LEFT);
+
         // Champ pour la direction à modifier
         ComboBox<String> directionCombo = new ComboBox<>();
         directionCombo.getItems().addAll("nord", "sud", "est", "ouest");
         Label directionLabel = new Label("Entrez la direction à modifier :");
         directionCombo.setPromptText("Choisir une direction");
         directionCombo.setVisible(false);
-        
         directionLabel.setVisible(false);
-        Button buttonRetour = new Button("Retour");
-        buttonRetour.setVisible(false);
+        
         // Action du bouton "Générer"
         buttonGenerer.setOnMouseClicked(event -> {
             try {
                 cancelRequested[0] = false;
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
-
+                // Vérification des valeurs de longueur et largeur
+                // Limite la longueur et la largeur à 20
                 if (longueur > 20) longueur = 20;
                 if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
@@ -123,7 +136,7 @@ public class App extends Application {
 
                 longueurField.setText(String.valueOf(longueur));
                 largeurField.setText(String.valueOf(largeur));
-
+                // Réinitialisation du GridPane
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
                 gridPane.getChildren().clear();
@@ -131,6 +144,8 @@ public class App extends Application {
                 gridPane.getRowConstraints().clear();
                 labyrintheHolder[0].genererLabyrinthe();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
+                // Ajustement de la taille du GridPane
+                // Si le labyrinthe est petit, on ajuste la taille
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
@@ -141,6 +156,7 @@ public class App extends Application {
                     gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                     gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
+                // Affichage des divers objets
                 buttonSauvegarder.setVisible(true);
                 buttonRestaurer.setVisible(false);
                 buttonTremauxdirect.setVisible(true);
@@ -150,7 +166,6 @@ public class App extends Application {
                 buttonDijkstraPasAPas.setVisible(true);
                 buttonDijkstradirect.setVisible(true);
                 algoButtonsBox.setVisible(true);
-                modificationAutorisee[0] = true;
                 buttonRetour.setVisible(true);
                 buttonSauvegarder.setVisible(true);
                 buttonRestaurer.setVisible(false);
@@ -160,17 +175,21 @@ public class App extends Application {
                 historiqueArea.setVisible(true);
                 directionCombo.setVisible(false);
                 directionLabel.setVisible(false);
+                // Autorisation de la modification
+                modificationAutorisee[0] = true;
                 
-               
-                /* if (labyrintheHolder[0] != null) {
+                
+                // Affichage de l'historique
+                 if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
                     }
-                }*/
+                }
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
         });
+        // Action du bouton "Sauvegarder" et "Restaurer"
         buttonSauvegarder.setOnMouseClicked(event -> {
             if (labyrintheHolder[0] == null) return;
                 try (PrintWriter writer = new PrintWriter(new FileWriter("labyrinthe_save.txt"))) {
@@ -190,6 +209,7 @@ public class App extends Application {
                 int longueur = Integer.parseInt(reader.readLine());
                 int largeur = Integer.parseInt(reader.readLine());
                 long seed = Long.parseLong(reader.readLine());
+                cancelRequested[0] = false;
                 gridPane.getChildren().clear();
                 gridPane.getColumnConstraints().clear();
                 gridPane.getRowConstraints().clear();
@@ -224,6 +244,8 @@ public class App extends Application {
                 }
                 labyrintheHolder[0] = lab;
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, lab);
+                // Ajustement de la taille du GridPane
+                // Si le labyrinthe est petit, on ajuste la taille
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
@@ -234,6 +256,7 @@ public class App extends Application {
                     gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                     gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
+                // Affichage des divers objets
                 buttonTremauxdirect.setVisible(true);
                 buttonTremauxPasAPas.setVisible(true);
                 buttonDeadEndPasaPas.setVisible(true);
@@ -251,7 +274,7 @@ public class App extends Application {
                 historiqueArea.setVisible(true);
                 directionCombo.setVisible(false);
                 directionLabel.setVisible(false);
-                
+                // Affichage de l'historique    
                 if (labyrintheHolder[0] != null) {
                     for (String li : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(li + "\n");
@@ -268,7 +291,8 @@ public class App extends Application {
                 cancelRequested[0] = false;
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
-
+                // Vérification des valeurs de longueur et largeur
+                // Limite la longueur et la largeur à 20
                 if (longueur > 20) longueur = 20;
                 if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
@@ -284,6 +308,8 @@ public class App extends Application {
                 gridPane.getRowConstraints().clear();
                 labyrintheHolder[0].genererImparfait();
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
+                // Ajustement de la taille du GridPane
+                // Si le labyrinthe est petit, on ajuste la taille
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
@@ -294,6 +320,7 @@ public class App extends Application {
                     gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                     gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
+                // Affichage des divers objets
                 buttonSauvegarder.setVisible(true);
                 buttonRestaurer.setVisible(false);
                 buttonTremauxdirect.setVisible(true);
@@ -314,7 +341,7 @@ public class App extends Application {
                 directionCombo.setVisible(false);
                 directionLabel.setVisible(false);
                 
-               
+                // Affichage de l'historique
                 if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
@@ -332,7 +359,8 @@ public class App extends Application {
                 cancelRequested[0] = false;
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
-
+                // Vérification des valeurs de longueur et largeur
+                // Limite la longueur et la largeur à 20
                 if (longueur > 20) longueur = 20;
                 if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
@@ -346,6 +374,7 @@ public class App extends Application {
                 long seed = Long.parseLong(seedField.getText());
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
                 labyrintheHolder[0].genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
+                    // Affichage des divers objets
                     buttonTremauxdirect.setVisible(true);
                     buttonTremauxPasAPas.setVisible(true);
                     buttonDeadEndPasaPas.setVisible(true);
@@ -353,8 +382,11 @@ public class App extends Application {
                     buttonDijkstraPasAPas.setVisible(true);
                     buttonDijkstradirect.setVisible(true);
                     algoButtonsBox.setVisible(true);
+                    // Autorisation de la modification
                     modificationAutorisee[0] = true;
                 }, Integer.parseInt(vitesse.getText()), cancelRequested);
+                // Ajustement de la taille du GridPane
+                // Si le labyrinthe est petit, on ajuste la taille
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
@@ -365,6 +397,7 @@ public class App extends Application {
                     gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                     gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
+                // Affichage des divers objets
                 buttonGenerer.setVisible(false);
                 buttonGenererImparfait.setVisible(false);
                 buttonRetour.setVisible(true);
@@ -376,6 +409,7 @@ public class App extends Application {
                 buttonRestaurer.setVisible(false);
                 directionCombo.setVisible(false);
                 directionLabel.setVisible(false);
+               //affichage de l'historique
                  if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
@@ -392,7 +426,8 @@ public class App extends Application {
                 cancelRequested[0] = false;
                 int longueur = Integer.parseInt(longueurField.getText());
                 int largeur = Integer.parseInt(largeurField.getText());
-
+                // Vérification des valeurs de longueur et largeur
+                // Limite la longueur et la largeur à 20
                 if (longueur > 20) longueur = 20;
                 if (largeur > 20) largeur = 20;
                 if (longueur < 1) longueur = 1;
@@ -407,6 +442,7 @@ public class App extends Application {
                 labyrintheHolder[0] = new Labyrinthe("MonLabyrinthe", longueur, largeur, seed);
 
                 labyrintheHolder[0].genererImparfaitPasAPas(gridPane, infoLabel, () -> {
+                    // Affichage des divers objets
                     buttonTremauxdirect.setVisible(true);
                     buttonTremauxPasAPas.setVisible(true);
                     buttonDeadEndPasaPas.setVisible(true);
@@ -416,6 +452,8 @@ public class App extends Application {
                     algoButtonsBox.setVisible(true);
                     modificationAutorisee[0] = true;
                 }, Integer.parseInt(vitesse.getText()), cancelRequested);
+                // Ajustement de la taille du GridPane
+                // Si le labyrinthe est petit, on ajuste la taille
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
@@ -425,7 +463,7 @@ public class App extends Application {
                     gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                     gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
-                
+                // Affichage des divers objets
                 buttonRetour.setVisible(true);
                 saisieFieldsBox.setVisible(false);
                 historiqueArea.setVisible(true);
@@ -433,7 +471,11 @@ public class App extends Application {
                 buttonRestaurer.setVisible(false);
                 directionCombo.setVisible(false);
                 directionLabel.setVisible(false);
-                
+                if (labyrintheHolder[0] != null) {
+                    for (String ligne : labyrintheHolder[0].getHistorique()) {
+                        historiqueArea.appendText(ligne + "\n");
+                    }
+                }
             } catch (NumberFormatException e) {
                 infoLabel.setText("Veuillez entrer des valeurs valides pour la longueur, la largeur et la seed.");
             }
@@ -537,11 +579,15 @@ public class App extends Application {
 
         // Gestion du clic sur une case du GridPane
         gridPane.setOnMouseClicked(event -> {
+            // Vérifie si la modification est autorisée
             if (!modificationAutorisee[0]) return;
+            // Vérifie si le clic est dans le labyrinthe
             double scale = gridPane.getScaleX();
             double mouseX = event.getX() / scale;
             double mouseY = event.getY() / scale;
             if (labyrintheHolder[0] == null) return;
+            // Calcule la case sur laquelle on a cliqué
+            // On divise la position de la souris par la taille de la cellule
             double cellWidth = gridPane.getWidth() / labyrintheHolder[0].getLongueur();
             double cellHeight = gridPane.getHeight() / labyrintheHolder[0].getLargeur();
             int col = (int) Math.floor(mouseX / cellWidth);
@@ -559,11 +605,19 @@ public class App extends Application {
                 // Mets la case sélectionnée en rouge
                 selectedCase[0].setCouleur(Color.RED);
                 AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrintheHolder[0]);
+                //ajustement de la taille du gridpane
+                // Si le labyrinthe est petit, on ajuste la taille
                 if (labyrintheHolder[0].getLongueur() * labyrintheHolder[0].getLargeur() < 400) {
                     gridPane.setMinSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setMaxSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
                     gridPane.setPrefSize(labyrintheHolder[0].getLongueur() * CELL_SIZE, labyrintheHolder[0].getLargeur() * CELL_SIZE);
+                }   
+                else {
+                    gridPane.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setMaxSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                    gridPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
                 }
+
                 directionCombo.setVisible(true);
                 directionLabel.setVisible(true);
                 directionCombo.getSelectionModel().clearSelection();
@@ -591,6 +645,7 @@ public class App extends Application {
                 previousColor[0] = null;
                 // Après la modification et l'affichage du labyrinthe
                 historiqueArea.clear();
+                // Affichage de l'historique
                 if (labyrintheHolder[0] != null) {
                     for (String ligne : labyrintheHolder[0].getHistorique()) {
                         historiqueArea.appendText(ligne + "\n");
@@ -600,10 +655,11 @@ public class App extends Application {
                 directionCombo.setPromptText("Nord, Sud, Est ou Ouest");
             }
         });
-
+        
         HBox labyBox = new HBox(gridPane, saisieBox);
         labyBox.setSpacing(30);
         labyBox.setAlignment(Pos.CENTER);
+        
         root.getChildren().addAll(directionLabel, directionCombo, labyBox, infoLabel,historiqueArea, buttonRetour);
 
         primaryStage.setScene(scene);
