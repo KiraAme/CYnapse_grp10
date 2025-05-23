@@ -4,6 +4,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * Classe pour afficher un labyrinthe dans une interface graphique JavaFX.
+ * Si le GridPane est null, le labyrinthe sera affiché dans la console.
+ * @version 1.0
+ * @author Groupe 10
+ */
 public class AfficheurLabyrinthe {
     private static final int TILE_SIZE = 30; 
 
@@ -20,6 +26,8 @@ public class AfficheurLabyrinthe {
             return;
         }
 
+        // Version graphique : affiche le labyrinthe dans le GridPane
+        // Efface le contenu précédent du GridPane
         gridPane.getChildren().clear();
 
         int nbLignes = labyrinthe.getLargeur();
@@ -28,15 +36,19 @@ public class AfficheurLabyrinthe {
         // Fixe la taille du GridPane pour qu'il affiche tout le labyrinthe sans scroll
         gridPane.setPrefWidth(nbColonnes * TILE_SIZE);
         gridPane.setPrefHeight(nbLignes * TILE_SIZE);
-
+        //
         for (int x = 0; x < nbLignes; x++) {
             for (int y = 0; y < nbColonnes; y++) {
+                // Crée une case du labyrinthe
+                // et l'ajoute a un StackPane
+                // qui sera ajouté au GridPane
                 Case currentCase = labyrinthe.getCarte()[x][y];
                 StackPane stackPane = new StackPane();
                 stackPane.setPrefSize(TILE_SIZE, TILE_SIZE);
 
                 Rectangle rectangle = new Rectangle(TILE_SIZE, TILE_SIZE);
 
+                // Définit la couleur de la case en fonction de son état
                 if (currentCase.estEntree) {
                     rectangle.setFill(Color.BLUE);
                 } else if (currentCase.estSortie) {
@@ -50,13 +62,13 @@ public class AfficheurLabyrinthe {
                 } else {
                     rectangle.setFill(Color.WHITE);
                 }
-
+                // Définit la bordure de la case
                 rectangle.setStroke(Color.GRAY);
                 stackPane.getChildren().add(rectangle);
-
+                // Définit la couleur des murs
                 double wallThickness = 4.0;
                 Color wallColor = Color.BLACK;
-
+                // Ajoute les murs au StackPane
                 if (currentCase.murNord) {
                     Rectangle murNord = new Rectangle(TILE_SIZE, wallThickness);
                     murNord.setFill(wallColor);
@@ -81,7 +93,8 @@ public class AfficheurLabyrinthe {
                     StackPane.setAlignment(murEst, Pos.CENTER_RIGHT);
                     stackPane.getChildren().add(murEst);
                 }
-
+                // Ajoute le StackPane au GridPane
+                // en utilisant les coordonnées de la case
                 gridPane.add(stackPane, y, x);
             }
         }

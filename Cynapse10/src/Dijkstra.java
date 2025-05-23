@@ -10,9 +10,23 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Stack;
 
-
+/**
+ * Classe représentant l'algorithme de Dijkstra pour résoudre un labyrinthe.
+ * Cet algorithme utilise une approche de recherche de chemin en utilisant une
+ * file de priorité pour explorer les cases du labyrinthe.
+ *
+ * @version 1.0
+ * @author Groupe 10
+ */
 public class Dijkstra extends Algorithme {
-
+    /**
+     * Exécute l'algorithme de Dijkstra de manière pas à pas.
+     *
+     * @param labyrinthe      Le labyrinthe à traiter.
+     * @param gridPane        Le GridPane pour l'affichage.
+     * @param infoLabel       Le label pour afficher les informations.
+     * @param cancelRequested Tableau de booléens pour demander l'annulation.
+     */
     @Override
     public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel, boolean[] cancelRequested) {
         Case[][] carte = labyrinthe.getCarte();
@@ -42,7 +56,13 @@ public class Dijkstra extends Algorithme {
         }
         executerEtapePasAPas(labyrinthe, gridPane, carte, pred, file, largeur, longueur, sortie, startTime,casesParcourues, infoLabel,cancelRequested);
     }
-
+    /**
+     * Exécute l'algorithme de Dijkstra de manière directe.
+     *
+     * @param labyrinthe Le labyrinthe à traiter.
+     * @param gridPane   Le GridPane pour l'affichage.
+     * @param infoLabel  Le label pour afficher les informations.
+     */
     @Override
     public void algoDirect(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel) {
         Case[][] carte = labyrinthe.getCarte();
@@ -139,7 +159,21 @@ public class Dijkstra extends Algorithme {
             System.out.println(labyrinthe.toString());
         }
     }
-
+    /**
+     * Exécute une étape de l'algorithme de Dijkstra pas à pas.
+     *
+     * @param labyrinthe      Le labyrinthe à traiter.
+     * @param gridPane        Le GridPane pour l'affichage.
+     * @param carte           La carte du labyrinthe.
+     * @param pred            Le tableau des prédécesseurs.
+     * @param file            La file de priorité pour explorer les cases.
+     * @param largeur         La largeur du labyrinthe.
+     * @param longueur        La longueur du labyrinthe.
+     * @param sortie          La case de sortie.
+     * @param startTime       Le temps de début de l'exécution.
+     * @param casesParcourues Tableau pour compter le nombre de cases parcourues.
+     * @param infoLabel       Le label pour afficher les informations.
+     */
     private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, Case[][] pred, PriorityQueue<Case> file,int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel,boolean[] cancelRequested) {
         if (file.isEmpty()) {
             long endTime = System.nanoTime();
@@ -242,7 +276,15 @@ public class Dijkstra extends Algorithme {
 
 
 
-
+    /**
+     * Vérifie si les coordonnées (x, y) sont dans les limites du labyrinthe.
+     *
+     * @param x        La coordonnée x.
+     * @param y        La coordonnée y.
+     * @param largeur  La largeur du labyrinthe.
+     * @param longueur La longueur du labyrinthe.
+     * @return true si les coordonnées sont dans les limites, false sinon.
+     */
     private boolean isInBounds(int x, int y, int largeur, int longueur) {
         return x >= 0 && y >= 0 && x < largeur && y < longueur;
     }

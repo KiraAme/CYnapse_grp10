@@ -8,8 +8,23 @@ import java.util.List;
 import java.util.Stack;
 
 
+/**
+ * Classe représentant l'algorithme de Tremaux pour résoudre un labyrinthe.
+ * Cet algorithme utilise une approche de parcours en profondeur avec une pile
+ * pour explorer le labyrinthe et trouver un chemin de l'entrée à la sortie.
+ *
+ * @version 1.0
+ * @author Groupe 10
+ */
 public class Tremaux extends Algorithme {
-
+    /**
+     * Exécute l'algorithme de Tremaux pas à pas.
+     *
+     * @param labyrinthe      Le labyrinthe à traiter.
+     * @param gridPane       Le GridPane pour l'affichage.
+     * @param infoLabel      Le label pour afficher les informations.
+     * @param cancelRequested Tableau de booléens pour demander l'annulation.
+     */
     @Override
     public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel, boolean[] cancelRequested) {
         Case[][] carte = labyrinthe.getCarte();
@@ -41,7 +56,13 @@ public class Tremaux extends Algorithme {
         }
         executerEtapePasAPas(labyrinthe, gridPane, carte, passages, pred, stack, largeur, longueur, sortie, startTime, casesParcourues, infoLabel, cancelRequested);
     }
-
+    /**
+     * Exécute l'algorithme de Tremaux de manière directe.
+     *
+     * @param labyrinthe Le labyrinthe à traiter.
+     * @param gridPane   Le GridPane pour l'affichage.
+     * @param infoLabel  Le label pour afficher les informations.
+     */
     @Override
     public void algoDirect(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel) {
         Case[][] carte = labyrinthe.getCarte();
@@ -150,7 +171,22 @@ public class Tremaux extends Algorithme {
             System.out.println("Nombre de cases parcourues : " + casesParcourues);
         }
     }
-
+    /**
+     * Exécute une étape de l'algorithme pas à pas.
+     *
+     * @param labyrinthe      Le labyrinthe à traiter.
+     * @param gridPane       Le GridPane pour l'affichage.
+     * @param carte          La carte du labyrinthe.
+     * @param passages       Le tableau des passages.
+     * @param pred           Le tableau des prédécesseurs.
+     * @param stack          La pile pour le parcours.
+     * @param largeur        La largeur du labyrinthe.
+     * @param longueur       La longueur du labyrinthe.
+     * @param sortie         La case de sortie.
+     * @param startTime      Le temps de début de l'exécution.
+     * @param casesParcourues Le compteur de cases parcourues.
+     * @param infoLabel      Le label pour afficher les informations.
+     */
     private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Case[][] pred, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel, boolean[] cancelRequested) {
         if (stack.isEmpty()) {
             long endTime = System.nanoTime();

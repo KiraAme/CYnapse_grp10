@@ -10,6 +10,12 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.util.Duration;
 
+/**
+ * Classe représentant un labyrinthe.
+ * Elle contient des méthodes pour générer, afficher et résoudre le labyrinthe.
+ * @version 1.0
+ * @author Groupe 10
+ */
 public class Labyrinthe {
     private String nom;
     private int longueur;
@@ -133,7 +139,7 @@ public class Labyrinthe {
      * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
      * @param infoLabel Le Label pour afficher les statistiques.
      * @param onFinish  La fonction à exécuter à la fin de la génération.
-     * @param pauseMillis La durée de la pause entre chaque étape en millisecondes.
+     * @param vitesse La durée de la pause entre chaque étape en millisecondes.
      * @param cancelRequested Un tableau de booléens pour annuler la génération.
      */
 
@@ -217,7 +223,9 @@ public class Labyrinthe {
         pause.play();
     }
     
-
+    /**
+     * Génère un labyrinthe imparfait en ajoutant des ouvertures aléatoires.
+     */
     public void genererImparfait(){
         this.genererLabyrinthe();
         for(int i=0; i<=((this.largeur*this.longueur)*5/100) ;i++){
@@ -286,6 +294,7 @@ public class Labyrinthe {
      * @param algo      L'algorithme à utiliser pour résoudre le labyrinthe.
      * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
      * @param infoLabel Le Label pour afficher les statistiques.
+     * @param cancelRequested Un tableau de booléens pour indiquer si l'annulation a été demandée.
      */
     public void résoudrePasAPas(Algo algo, GridPane gridPane, Label infoLabel,boolean[] cancelRequested) {
         Algorithme algorithme = null;
@@ -308,58 +317,7 @@ public class Labyrinthe {
         algorithme.algoPasAPas(this, gridPane, infoLabel, cancelRequested);
     }
 
-    /**
-     * Affiche le labyrinthe sous forme de chaîne de caractères.
-     */
-    @Override
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        // Ligne des indices y (colonnes)
-        sb.append("    ");
-        for (int y = 0; y < this.longueur; y++) {
-            sb.append(" "+String.format("%-3d", y));
-        }
-        sb.append("\n");
-
-        // Ligne des murs nord
-        sb.append("   ");
-        for (int y = 0; y < this.longueur; y++) {
-            sb.append("+---");
-        }
-        sb.append("+\n");
-
-        for (int x = 0; x < this.largeur; x++) {
-            // Ligne des cases avec indice x à gauche
-            sb.append(String.format("%-3d", x));
-            for (int y = 0; y < this.longueur; y++) {
-                sb.append(this.carte[x][y].murOuest ? "| " : "  ");
-                if (this.carte[x][y].estEntree) {
-                    sb.append("E ");
-                } else if (this.carte[x][y].estSortie) {
-                    sb.append("S ");
-                } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.YELLOW)) {
-                    sb.append("* ");
-                } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.RED)) {
-                    sb.append(". ");
-                } else {
-                    sb.append("  ");
-                }
-            }
-            sb.append("|\n");
-
-            // Ligne des murs sud
-            sb.append("   ");
-            for (int y = 0; y < this.longueur; y++) {
-                sb.append("+");
-                sb.append(this.carte[x][y].murSud ? "---" : "   ");
-            }
-            sb.append("+\n");
-        }
-
-        return sb.toString();
-    }
+    
     /**
      * @return le nom du labyrinthe
      */
@@ -390,7 +348,9 @@ public class Labyrinthe {
      */
     public Case getSortie() { return sortie; }
 
-
+    /**
+     * @return la graine utilisée pour générer le labyrinthe
+     */
     public long getSeed() { return seed; }
     /**
      * Modifie le labyrinthe en ajoutant ou supprimant un mur dans une direction donnée.
@@ -494,6 +454,15 @@ public class Labyrinthe {
     public void resetHistorique() {
         historique.clear();
     }
+    /**
+     * Génère un labyrinthe imparfait pas à pas.
+     *
+     * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
+     * @param infoLabel Le Label pour afficher les statistiques.
+     * @param onFinish  La fonction à exécuter à la fin de la génération.
+     * @param vitesse   La vitesse de l'animation en millisecondes.
+     * @param cancelRequested Un tableau de booléens pour annuler la génération.
+     */
     public void genererImparfaitPasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
         // Génération du labyrinthe parfait pas à pas
         this.genererLabyrinthePasAPas(gridPane, infoLabel, () -> {
@@ -503,7 +472,15 @@ public class Labyrinthe {
     }
 
 
-    // Ajoute des ouvertures pour rendre le labyrinthe imparfait, pas à pas
+    /**
+     * Ajoute des ouvertures imparfaites pas à pas dans le labyrinthe.
+     *
+     * @param gridPane  Le GridPane dans lequel afficher le labyrinthe.
+     * @param infoLabel Le Label pour afficher les statistiques.
+     * @param onFinish  La fonction à exécuter à la fin de l'ajout d'ouvertures.
+     * @param vitesse   La vitesse de l'animation en millisecondes.
+     * @param cancelRequested Un tableau de booléens pour annuler l'ajout d'ouvertures.
+     */
     private void ajouterOuverturesImparfaitesPasAPas(GridPane gridPane, Label infoLabel, Runnable onFinish, int vitesse, boolean[] cancelRequested) {
         int nbOuvertures = Math.max(1, (this.largeur * this.longueur) * 5 / 100);
         int[] compteur = {0};
@@ -512,9 +489,10 @@ public class Labyrinthe {
         // step est une fonction qui sera appelée à chaque étape de l'animation
         // Elle utilise une variable pour garder la trace du nombre d'ouvertures ajoutées
         Runnable step = new Runnable() {
+            
+            // La méthode run() sera appelée à chaque étape de l'animation
+            // Elle vérifie si l'annulation a été demandée ou si le nombre d'ouvertures a été atteint
             @Override
-            // Cette méthode sera appelée à chaque étape de l'animation
-
             public void run() {
                 if (cancelRequested[0] || compteur[0] >= nbOuvertures) {
                     if (onFinish != null) onFinish.run();
@@ -559,4 +537,61 @@ public class Labyrinthe {
         };
         step.run();
     }
+
+    /**
+     * Affiche le labyrinthe sous forme de chaîne de caractères.
+     */
+    @Override
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        // Ligne des indices y (colonnes)
+        sb.append("    ");
+        for (int y = 0; y < this.longueur; y++) {
+            sb.append(" "+String.format("%-3d", y));
+        }
+        sb.append("\n");
+
+        // Ligne des murs nord
+        sb.append("   ");
+        for (int y = 0; y < this.longueur; y++) {
+            sb.append("+---");
+        }
+        sb.append("+\n");
+
+        for (int x = 0; x < this.largeur; x++) {
+            // Ligne des cases avec indice x à gauche
+            sb.append(String.format("%-3d", x));
+            for (int y = 0; y < this.longueur; y++) {
+                sb.append(this.carte[x][y].murOuest ? "| " : "  ");
+                if (this.carte[x][y].estEntree) {
+                    sb.append("E ");
+                } else if (this.carte[x][y].estSortie) {
+                    sb.append("S ");
+                } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.YELLOW)) {
+                    sb.append("* ");
+                } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.RED)) {
+                    sb.append(". ");
+                } else {
+                    sb.append("  ");
+                }
+            }
+            sb.append("|\n");
+
+            // Ligne des murs sud
+            sb.append("   ");
+            for (int y = 0; y < this.longueur; y++) {
+                sb.append("+");
+                sb.append(this.carte[x][y].murSud ? "---" : "   ");
+            }
+            sb.append("+\n");
+        }
+
+        return sb.toString();
+    }
 }
+
+
+
+

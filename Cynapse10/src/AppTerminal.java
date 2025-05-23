@@ -1,10 +1,19 @@
 import java.util.Scanner;
 import java.io.*;
 
+/**
+ * AppTerminal.java
+ * 
+ * Classe principale pour le générateur de labyrinthes en mode terminal.
+ * Permet de créer, modifier, sauvegarder et résoudre un labyrinthe.
+ * @version 1.0
+ * @author Groupe 10
+ */
 public class AppTerminal {
     /**
      * Classe principale pour le générateur de labyrinthes en mode terminal.
      * Permet de créer, modifier, sauvegarder et résoudre un labyrinthe.
+     * @param args Arguments de la ligne de commande (non utilisés).
      */
     public static void main(String[] args) {
         // Initialisation du générateur de labyrinthe

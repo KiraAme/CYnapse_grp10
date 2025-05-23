@@ -8,9 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-
+/** 
+ * Classe représentant l'algorithme de recherche de cul-de-sac dans un labyrinthe.
+ * Cet algorithme explore le labyrinthe pour trouver les cul-de-sac et déterminer  
+ *  @version 1.0
+ * @author Groupe 10
+ */
 public class DeadEnd extends Algorithme {
 
+    /**
+     * Exécute l'algorithme de recherche de cul-de-sac pas à pas.
+     *
+     * @param labyrinthe Le labyrinthe à traiter.
+     * @param gridPane   Le GridPane pour l'affichage.
+     * @param infoLabel  Le label pour afficher les informations.
+     * @param cancelRequested Tableau de booléens pour demander l'annulation.
+     */
     @Override
     public void algoPasAPas(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel, boolean[] cancelRequested) {
         Case[][] carte = labyrinthe.getCarte();
@@ -65,6 +78,13 @@ public class DeadEnd extends Algorithme {
         executerEtapePasAPas(labyrinthe, gridPane, carte, passages, stack, largeur, longueur, sortie, startTime,casesParcourues, infoLabel,cancelRequested);
     }
 
+    /**
+     * Exécute l'algorithme de recherche de cul-de-sac de manière directe.
+     *
+     * @param labyrinthe Le labyrinthe à traiter.
+     * @param gridPane   Le GridPane pour l'affichage.
+     * @param infoLabel  Le label pour afficher les informations.
+     */
     @Override
     public void algoDirect(Labyrinthe labyrinthe, GridPane gridPane, Label infoLabel) {
         Case[][] carte = labyrinthe.getCarte();
@@ -203,6 +223,21 @@ public class DeadEnd extends Algorithme {
         }
     }
 
+    /**
+     * Exécute une étape de l'algorithme pas à pas.
+     *
+     * @param labyrinthe      Le labyrinthe à traiter.
+     * @param gridPane        Le GridPane pour l'affichage.
+     * @param carte           La carte du labyrinthe.
+     * @param passages        Le tableau des passages.
+     * @param stack           La pile pour le parcours.
+     * @param largeur         La largeur du labyrinthe.
+     * @param longueur        La longueur du labyrinthe.
+     * @param sortie          La case de sortie.
+     * @param startTime       Le temps de début de l'exécution.
+     * @param casesParcourues Le nombre de cases parcourues.
+     * @param infoLabel       Le label pour afficher les informations.
+     */
     private void executerEtapePasAPas(Labyrinthe labyrinthe, GridPane gridPane, Case[][] carte, int[][] passages, Stack<Case> stack, int largeur, int longueur, Case sortie, long startTime, int[] casesParcourues, Label infoLabel,boolean[] cancelRequested) {
         if (stack.isEmpty()) {
             long endTime = System.nanoTime();
@@ -293,7 +328,15 @@ public class DeadEnd extends Algorithme {
 
 
 
-
+    /**
+     * Vérifie si les coordonnées (x, y) sont dans les limites du labyrinthe.
+     *
+     * @param x        La coordonnée x.
+     * @param y        La coordonnée y.
+     * @param largeur  La largeur du labyrinthe.
+     * @param longueur La longueur du labyrinthe.
+     * @return true si (x, y) est dans les limites, false sinon.
+     */
     private boolean isInBounds(int x, int y, int largeur, int longueur) {
         return x >= 0 && y >= 0 && x < largeur && y < longueur;
     }
@@ -338,7 +381,14 @@ public class DeadEnd extends Algorithme {
         AfficheurLabyrinthe.afficherLabyrinthe(gridPane, labyrinthe);
         return chemin;
     }
-
+    /**
+     * Trouve la composante connexe à partir de la case de sortie.
+     *
+     * @param sortie La case de sortie.
+     * @param chemin La liste des cases à explorer.
+     * @param labyrinthe Le labyrinthe à traiter.
+     * @return La liste des cases accessibles à partir de la case de sortie.
+     */
     private ArrayList<Case> trouverComposanteConnexe (Case sortie, ArrayList<Case> chemin, Labyrinthe labyrinthe){
         ArrayList<Case> cheminConnexe = new ArrayList<Case>();
         cheminConnexe.add(sortie);
@@ -346,7 +396,15 @@ public class DeadEnd extends Algorithme {
         return cheminConnexe;
     }
     
-
+    /**
+     * Effectue une recherche en profondeur (DFS) pour trouver les cases accessibles à partir de la case donnée.
+     *
+     * @param c              La case actuelle.
+     * @param cases          La liste des cases à explorer.
+     * @param casesParcourues La liste des cases déjà parcourues.
+     * @param labyrinthe     Le labyrinthe à traiter.
+     * @return La liste des cases accessibles à partir de la case donnée.
+     */
     private ArrayList<Case> dfs(Case c, ArrayList<Case> cases, ArrayList<Case> casesParcourues, Labyrinthe labyrinthe){
         if(casesParcourues.contains(c)){
             int x = c.getX();

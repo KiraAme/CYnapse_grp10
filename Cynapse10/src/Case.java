@@ -1,8 +1,16 @@
 import javafx.scene.paint.Color;
 
+/**
+ * Classe représentant une case dans un labyrinthe.
+ * Chaque case a des murs (Nord, Sud, Est, Ouest) et peut être une entrée ou une sortie.
+ * @version 1.0
+ * @author Groupe 10
+ */
 public class Case {
     private int x;
     private int y;
+    // Les murs de la case
+    // murNord, murSud, murOuest, murEst
     public boolean murNord;
     public boolean murSud;
     public boolean murOuest;
@@ -21,9 +29,9 @@ public class Case {
      * @param mN si la case au Nord est un mur
      * @param mS si la case au Sud est un mur
      * @param mE si la case à l'Est est un mur
-     * @param mO si la case à l'Ouest est un mur
-     * @param estM si la case est un mur
+     * @param mO si la case à l'Ouest est un mur     
      * @param estS si la case est une sortie
+     * @param estE si la case est une entrée
     */
     public Case(int x, int y, boolean mN, boolean mS, boolean mE, boolean mO, boolean estS, boolean estE) {
         this.x=x;
@@ -46,7 +54,7 @@ public class Case {
         return this.distance;
     }
     /**
-     * @param la distance au noeud de départ (pour dijkstra) initialisée à 0
+     * @param distance la distance au noeud de départ (pour dijkstra) initialisée à 0
      */
     public void setDistance(int distance) {
         this.distance=distance;
@@ -102,18 +110,27 @@ public class Case {
     public boolean isEstEntree() {
         return estEntree;
     }
+    /**
+     * @return si la case est parcourue
+     */
     public boolean estParcourue() {
         return parcourue;
     }
-
+    /**
+     * @param parcourue si la case est parcourue
+     */
     public void setParcourue(boolean parcourue) {
         this.parcourue = parcourue;
     }
-    // Méthodes pour obtenir et modifier la couleur
+    /**
+     * @return la couleur de la case
+     */
     public Color getCouleur() {
         return couleur;
     }
-
+    /**
+     * @param couleur la couleur de la case
+     */
     public void setCouleur(Color couleur) {
         this.couleur = couleur;
     }

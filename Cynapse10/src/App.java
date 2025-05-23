@@ -18,6 +18,10 @@ import javafx.scene.layout.Region;
 /**
  * Classe principale de l'application JavaFX.
  * Cette classe gère l'interface utilisateur et les interactions avec l'utilisateur.
+ * Elle permet de générer des labyrinthes, de les afficher, de les sauvegarder et de les restaurer.
+ * Elle permet également de résoudre les labyrinthes en utilisant différents algorithmes.
+ * @version 1.0
+ * @author Groupe 10
  */
 public class App extends Application {
 
@@ -666,6 +670,13 @@ public class App extends Application {
         primaryStage.show();
     }
 
+    
+    /**
+     * Méthode principale pour lancer l'application JavaFX.
+     *
+     * @param args Les arguments de la ligne de commande.
+     * @throws Exception Si une erreur se produit lors du lancement de l'application.
+     */
     public static void main(String[] args) throws Exception {
         launch(args);
     }
