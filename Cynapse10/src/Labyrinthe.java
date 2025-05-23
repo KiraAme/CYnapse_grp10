@@ -552,7 +552,8 @@ public class Labyrinthe {
             sb.append(" "+String.format("%-3d", y));
         }
         sb.append("\n");
-
+        String ANSI_YELLOW = "\u001B[33m";
+        String ANSI_RESET = "\u001B[0m";
         // Ligne des murs nord
         sb.append("   ");
         for (int y = 0; y < this.longueur; y++) {
@@ -570,7 +571,7 @@ public class Labyrinthe {
                 } else if (this.carte[x][y].estSortie) {
                     sb.append("S ");
                 } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.YELLOW)) {
-                    sb.append("* ");
+                    sb.append(ANSI_YELLOW).append("* ").append(ANSI_RESET);
                 } else if (this.carte[x][y].getCouleur() != null && this.carte[x][y].getCouleur().equals(javafx.scene.paint.Color.RED)) {
                     sb.append(". ");
                 } else {
