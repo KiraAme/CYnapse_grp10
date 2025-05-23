@@ -46,7 +46,7 @@ public class AppTerminal {
             } else {
                 scanner.next();
             }
-            System.out.println("Veuillez entrer un entier entre 1 et 50.");
+            System.out.println("Veuillez entrer un entier entre 1 et 30.");
         }
 
         // Saisie sécurisée du seed
@@ -131,7 +131,7 @@ public class AppTerminal {
                         // Saisie sécurisée de la direction
                         String direction = "";
                         while (true) {
-                            System.out.print("Mur à modifier (nord/sud/est/ouest) : ");
+                            System.out.print("Mur à modifier (n/s/e/o) : ");
                             direction = scanner.nextLine().trim().toLowerCase();
                             if (direction.equals("n") || direction.equals("s") || direction.equals("e") || direction.equals("o")) break;
                             System.out.println("Veuillez entrer 'n', 's', 'e' ou 'o'.");
