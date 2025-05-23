@@ -90,6 +90,7 @@ public class AppTerminal {
         // === MENU PRINCIPAL ===
         boolean quitter = false;
         while (!quitter) {
+
             System.out.println("\nQue voulez-vous faire ?");
             System.out.println("1. Modifier une case");
             System.out.println("2. Sauvegarder");
@@ -98,7 +99,7 @@ public class AppTerminal {
             System.out.println("5. Quitter");
             System.out.print("Votre choix : ");
             String choixMenu = scanner.nextLine().trim();
-
+            lab.reset();
             switch (choixMenu) {
                 case "1": // Modifier une case
                     String modif = "o";
