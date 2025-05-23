@@ -1,102 +1,22 @@
-🧩 Générateur et Solveur de Labyrinthes — JavaFX & Terminal
+Version JavaFX :
+-nécessite soit : -  une version antérieure à Java 11, Java 8 marche très bien
+		  -  une version plus récente avec sa version de javafx à télécharger en plus
+-comment ça marche:
+		  - le labyrinthe est contraint à une taille de 20 x 20 
+		  - l'utilisateur rentre : longueur, largeur, seed, vitesse et choisi s'il veut un labyrinthe parfait/imparfait et le type de génération, pas à pas ou direct. Il peut aussi restaurer un labyritnhe précédemment sauvegarder
+		  - une fois généré, on peut modifier le labyrinthe en cliquant sur une case puis en choisissant la direction du mur à changer. On peut sauvegarder le labyrinthe également. Et on peut le résoudre avec : Trémaux, Dead-end et Dijkstra. Les 3 en versions directes ou pas à pas.
+		  - en cours de résolution pas à pas les statistiques s'affichent en temps réel et en direct elles s'affichent dès la fin de la résolution.
+		  - un bouton retour est aussi disponible qui annule les algos pas à pas et qui retourne au menu principal de génération.
+		  - un bouton sauvegarder est aussi disponible qui sauvegarde le labyrinthe affiché.
+
+Version Terminal :
+
+-comment ça marche:
+		  - le labyrinthe est contraint à une taille de 30 x 30
+		  - l'utilisateur rentre : longueur, largeur, seed et choisi s'il veut un labyrinthe parfait/imparfaitt.
+		  - une fois généré, on peut modifier le labyrinthe en indiquant les coordonées de la case puis en choisissant la direction du mur à changer (n/s/e/o). 
+		  - on peut sauvegarder le labyrinthe également. Et on peut le résoudre avec : Trémaux, Dead-end et Dijkstra. Il peut aussi restaurer un labyrinthe précédemment sauvegarder.
+		  - et on peut quitter, ce qui met fin au programme.
+		  🧩 Générateur et Solveur de Labyrinthes — JavaFX & Terminal
 Ce projet permet de générer, modifier, sauvegarder et résoudre des labyrinthes via une interface graphique JavaFX ou en mode terminal. Plusieurs algorithmes de résolution sont disponibles, ainsi qu'un mode pas à pas pour observer leur fonctionnement en direct.
 
-📦 Prérequis
-JavaFX
-Fonctionne avec :
-
-Java 8 (JavaFX intégré)
-
-Java 11+ (nécessite de télécharger JavaFX séparément)
-
-🎮 Interface Graphique (JavaFX)
-✅ Fonctionnalités
-Taille fixe : 20 x 20 cases
-
-L'utilisateur peut saisir :
-
-Longueur et largeur
-
-Graine aléatoire (seed)
-
-Vitesse d'animation
-
-Type de labyrinthe : Parfait ou Imparfait
-
-Mode de génération : Pas à pas ou Direct
-
-Option de restauration depuis un fichier sauvegardé
-
-✏️ Interaction
-Une fois le labyrinthe généré :
-
-Cliquer sur une case pour modifier ses murs (choisir la direction)
-
-Possibilité de sauvegarder le labyrinthe
-
-Résolution possible via 3 algorithmes :
-
-Trémaux
-
-Dead-end Filling
-
-Dijkstra
-
-Chaque algorithme peut être lancé en mode direct ou pas à pas
-
-📊 Statistiques
-En mode pas à pas : affichage des statistiques en temps réel
-
-En mode direct : statistiques affichées à la fin de la résolution
-
-🔄 Navigation
-Bouton Retour : annule l’algorithme en cours (si pas à pas) et revient au menu principal
-
-Bouton Sauvegarder : enregistre le labyrinthe affiché
-
-🖥️ Mode Terminal
-✅ Fonctionnalités
-Taille fixe : 30 x 30 cases
-
-L’utilisateur saisit :
-
-Longueur et largeur
-
-Graine aléatoire (seed)
-
-Type de labyrinthe : Parfait ou Imparfait
-
-✏️ Interaction
-Modification des murs via :
-
-Saisie des coordonnées de la case
-
-Choix de la direction du mur à modifier (n / s / e / o)
-
-Possibilité de :
-
-Sauvegarder le labyrinthe
-
-Restaurer un labyrinthe existant
-
-Résoudre le labyrinthe avec :
-
-Trémaux
-
-Dead-end Filling
-
-Dijkstra
-
-Option de quitter le programme
-
-📁 Sauvegarde et Restauration
-Sauvegardes compatibles avec les deux interfaces
-
-Possibilité de reprendre un labyrinthe à tout moment
-
-🧠 Algorithmes Implémentés
-Trémaux : parcours avec marquage de chemin
-
-Dead-end Filling : élimination des impasses
-
-Dijkstra : calcul de plus court chemin
